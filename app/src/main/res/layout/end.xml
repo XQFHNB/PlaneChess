@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical" 
+    android:background="@drawable/bg">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/txtTest"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="继续游戏"
+        android:id="@+id/continuebt"
+        android:background="@color/yellow"
+        android:textSize="30sp"
+        android:width="150dp"
+        android:height="40dp"
+        android:gravity="center"
+        android:layout_marginBottom="25dp"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/return_activity_main"
+        android:text=" 返回首页"
+        android:background="@color/red"
+        android:textSize="30sp"
+        android:width="150dp"
+        android:height="40dp"
+        android:gravity="center"/>
+
+</LinearLayout>

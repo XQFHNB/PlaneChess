@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="room_name">
+        <item>001</item>
+        <item>002</item>
+        <item>003</item>
+    </string-array>
+</resources>
