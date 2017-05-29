@@ -29,13 +29,13 @@
         android:id="@+id/btn_test3"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:background="@drawable/plane_red"/>
+        android:background="@drawable/plane_yellow"/>
 
     <Button
         android:id="@+id/btn_test4"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:background="@drawable/plane_red"/>
+        android:background="@drawable/plane_green"/>
 
 
 </LinearLayout>

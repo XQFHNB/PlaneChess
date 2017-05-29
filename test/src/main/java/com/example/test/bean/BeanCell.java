@@ -15,6 +15,15 @@ public class BeanCell {
     public static final int[] sColors = new int[]{COLOR_BLUE, COLOR_RED, COLOR_YELLOW, COLOR_GREEN};
 
     int x;
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
     int y;
     int color;
 

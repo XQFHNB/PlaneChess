@@ -161,8 +161,9 @@ public class BeanBoard {
                         result = currentIndex + 4;
                     }
                 }
+                result %= 52;
             } else {
-                result = (currentIndex) % 52;
+                result = currentIndex%52;
             }
         }
 
