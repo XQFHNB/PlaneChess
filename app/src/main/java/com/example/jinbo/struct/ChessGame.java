@@ -389,7 +389,9 @@ public class ChessGame {
             //如果不在跑道上，说明在基地
             if (rule_Start(chess, step)) {
                 return true;
-            } else return false;
+            } else {
+                return false;
+            }
         }
 
         if (prePoint > MAX_SQUARE_NUM) {   //这个IF是用于终点跑道的倒退检测
