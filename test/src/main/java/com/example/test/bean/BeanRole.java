@@ -1,5 +1,6 @@
 package com.example.test.bean;
 
+import android.util.Log;
 import android.widget.Button;
 
 import java.util.ArrayList;
@@ -11,10 +12,10 @@ import java.util.List;
  */
 public class BeanRole {
 
-    public static final int START_BLUE = 0;
-    public static final int START_RED = 13;
-    public static final int START_YELLOW = 26;
-    public static final int START_GREEN = 39;
+    public static final int START_BLUE_NORMAL = 0;
+    public static final int START_RED_NORMAL = 13;
+    public static final int START_YELLOW_NORMAL = 26;
+    public static final int START_GREEN_NORMAL = 39;
 
     public static final int END_BLUE_NORMAL = 48;
     public static final int END_RED_NOMAL = 9;
@@ -26,10 +27,10 @@ public class BeanRole {
     public static final int START_YELLOW_END = 80;
     public static final int START_GREEN_END = 90;
 
-    public static final int END_BLUE_END = 67;
-    public static final int END_RED_END = 77;
-    public static final int END_YELLOW_END = 87;
-    public static final int END_GREEN_END = 97;
+    public static final int END_BLUE_END = 66;
+    public static final int END_RED_END = 76;
+    public static final int END_YELLOW_END = 86;
+    public static final int END_GREEN_END = 96;
 
     public static final int JUMP_SMALL = 4;
     public static final int JUMP_BIG = 12;
@@ -137,10 +138,10 @@ public class BeanRole {
     public static List<BeanRole> getRoleList() {
 
         List<BeanRole> list = new ArrayList<>();
-        BeanRole blue = new BeanRole(BeanCell.COLOR_BLUE, START_BLUE);
-        BeanRole red = new BeanRole(BeanCell.COLOR_RED, START_RED);
-        BeanRole yello = new BeanRole(BeanCell.COLOR_YELLOW, START_YELLOW);
-        BeanRole green = new BeanRole(BeanCell.COLOR_GREEN, START_GREEN);
+        BeanRole blue = new BeanRole(BeanCell.COLOR_BLUE, START_BLUE_NORMAL);
+        BeanRole red = new BeanRole(BeanCell.COLOR_RED, START_RED_NORMAL);
+        BeanRole yello = new BeanRole(BeanCell.COLOR_YELLOW, START_YELLOW_NORMAL);
+        BeanRole green = new BeanRole(BeanCell.COLOR_GREEN, START_GREEN_NORMAL);
         list.add(blue);
         list.add(red);
         list.add(yello);
@@ -159,7 +160,10 @@ public class BeanRole {
         return result;
     }
 
-    public void NormalMove() {
+    /**
+     * 正常的外围跑道
+     */
+    public void normalMove() {
         if (color == BeanCell.COLOR_BLUE) {
             blueNormalMove();
         } else if (color == BeanCell.COLOR_RED) {
@@ -171,6 +175,10 @@ public class BeanRole {
         }
 
     }
+
+    /**
+     * 结束跑道
+     */
 
     public void endMove() {
         if (color == BeanCell.COLOR_BLUE) {
@@ -185,6 +193,9 @@ public class BeanRole {
     }
 
 
+    /**
+     * 蓝色正常移动
+     */
     private void blueNormalMove() {
         int temp = currentIndex + mNum;
         if (temp >= END_BLUE_NORMAL) {
@@ -208,8 +219,11 @@ public class BeanRole {
         currentIndex = temp;
     }
 
+    /**
+     * 蓝色最后移动
+     */
     private void blueEndMove() {
-        int temp = currentIndex + mNum;
+        int temp = currentIndexInEnd + mNum;
         if (temp == END_BLUE_END) {
             isFinish = true;
             return;
@@ -222,33 +236,165 @@ public class BeanRole {
         currentIndexInEnd = temp;
     }
 
+    /**
+     * 红色正常移动
+     */
     private void redNormalMove() {
         int temp = currentIndex + mNum;
-        if (temp >= 9 && temp < 14) {
+        if (temp >= END_RED_NOMAL && temp <= START_RED_NORMAL + 1 && currentIndex <= START_RED_NORMAL - 1) {
             isNormalEnd = true;
+            temp = temp - END_RED_NOMAL + START_RED_END;
+            currentIndexInEnd = temp;
+            move(temp);
+
+        } else {
+            temp = temp % 52;
+            BeanCell cell = mBeanCells.get(temp);
+            if (cell.getColor() == color) {
+                if (temp == JUMP_RED_START) {
+                    temp += JUMP_BIG;
+                } else {
+                    temp += JUMP_SMALL;
+                }
+                if (temp >= END_RED_NOMAL && temp <= START_RED_NORMAL + 1 && currentIndex <= START_RED_NORMAL - 1) {
+                    isNormalEnd = true;
+                    temp = temp - END_RED_NOMAL + START_RED_END;
+                    currentIndexInEnd = temp;
+                    move(temp);
+                } else {
+                    temp = temp % 52;
+                    move(temp);
+                    currentIndex = temp;
+                }
+            } else {
+                move(temp);
+                currentIndex = temp;
+            }
+
         }
 
     }
 
-    private void yellowNormalMove() {
-    }
-
-    private void greenNormalMove() {
-    }
+    /**
+     * 红色结束时的移动
+     */
 
 
     private void redEndMove() {
+        int temp = currentIndexInEnd + mNum;
+        if (temp == END_RED_END) {
+            isFinish = true;
+            return;
+        } else if (temp < END_RED_END) {
+            currentIndexInEnd = temp;
+        } else if (temp > END_RED_END) {
+            currentIndexInEnd = END_RED_END - (temp % END_RED_END);
+        }
+        move(temp);
+        currentIndexInEnd = temp;
+    }
+
+
+    private void greenNormalMove() {
+        int temp = currentIndex + mNum;
+        if (temp >= END_GREEN_NORMAL && temp <= START_GREEN_NORMAL + 1 && currentIndex <= START_GREEN_NORMAL - 1) {
+            isNormalEnd = true;
+            temp = temp - END_GREEN_NORMAL + START_GREEN_END;
+            currentIndexInEnd = temp;
+            move(temp);
+        } else {
+            temp = temp % 52;
+            BeanCell cell = mBeanCells.get(temp);
+            if (cell.getColor() == color) {
+                if (temp == JUMP_GREEN_START) {
+                    temp += JUMP_BIG;
+                } else {
+                    temp += JUMP_SMALL;
+                }
+                if (temp >= END_GREEN_NORMAL && temp <= START_GREEN_NORMAL + 1 && currentIndex <= START_GREEN_NORMAL - 1) {
+                    isFinish = true;
+                    temp = temp - END_GREEN_NORMAL + START_GREEN_END;
+                    currentIndexInEnd = temp;
+                    move(temp);
+                } else {
+                    temp = temp % 52;
+                    move(temp);
+                    currentIndex = temp;
+                }
+            } else {
+                move(temp);
+                currentIndex = temp;
+            }
+        }
+
+    }
+
+
+    private void greenEndMove() {
+        int temp = currentIndexInEnd + mNum;
+        if (temp == END_GREEN_END) {
+            isFinish = true;
+            return;
+        } else if (temp < END_GREEN_END) {
+            currentIndexInEnd = temp;
+        } else if (temp > END_BLUE_END) {
+            currentIndexInEnd = END_GREEN_END - (temp % END_GREEN_END);
+        }
+        move(temp);
+        currentIndexInEnd = temp;
+    }
+
+    private void yellowNormalMove() {
+        int temp = currentIndex + mNum;
+        if (temp >= END_YELLOW_NORMAL && temp <= START_YELLOW_NORMAL + 1 && currentIndex <= START_YELLOW_NORMAL - 1) {
+            isNormalEnd = true;
+            temp = temp - END_YELLOW_NORMAL + START_YELLOW_END;
+            currentIndexInEnd = temp;
+            move(temp);
+        } else {
+            temp = temp % 52;
+            BeanCell cell = mBeanCells.get(temp);
+            if (cell.getColor() == color) {
+                if (temp == JUMP_YELLOW_START) {
+                    temp += JUMP_BIG;
+                } else {
+                    temp += JUMP_SMALL;
+                }
+                if (temp >= END_YELLOW_NORMAL && temp <= START_YELLOW_NORMAL + 1 && currentIndex <= START_YELLOW_NORMAL - 1) {
+                    isNormalEnd = true;
+                    temp = temp - END_YELLOW_NORMAL + START_YELLOW_END;
+                    currentIndexInEnd = temp;
+                    move(temp);
+                } else {
+                    temp = temp % 52;
+                    move(temp);
+                    currentIndex = temp;
+                }
+            } else {
+                move(temp);
+                currentIndex = temp;
+            }
+        }
     }
 
     private void yellowEndMove() {
-
+        int temp = currentIndexInEnd + mNum;
+        if (temp == END_YELLOW_END) {
+            isFinish = true;
+            return;
+        } else if (temp < END_YELLOW_END) {
+            currentIndexInEnd = temp;
+        } else if (temp > END_YELLOW_NORMAL) {
+            currentIndexInEnd = END_YELLOW_END - (temp % END_YELLOW_NORMAL);
+        }
+        move(temp);
+        currentIndexInEnd = temp;
     }
 
-    private void greenEndMove() {
-
-    }
 
     private void move(int temp) {
+
+        Log.d("test", "move方法中的temp:" + temp);
         BeanCell cell = mBeanCells.get(temp);
         float destX = (cell.getX() - x) * mXScale;
         float destY = (cell.getY() - 2 * x) * mYScale;
