@@ -73,6 +73,35 @@ public class BeanBoard {
                 78, 92, 106, 120, 134, 148, 162
         };
 
+
+        int[] baseBlueX = new int[]{
+                286, 320, 354, 320,
+        };
+        int[] baseBlueY = new int[]{
+                324, 306, 324, 306
+        };
+
+        int[] baseRedX = new int[]{
+                24, 58, 92, 58
+        };
+        int[] baseRedY = new int[]{
+                180, 162, 180, 198
+        };
+
+        int[] baseYellowX = new int[]{
+                286, 320, 354, 320,
+        };
+        int[] baseYellowY = new int[]{
+                40, 22, 40, 58
+        };
+        int[] baseGreenX = new int[]{
+                546, 580, 614, 580,
+        };
+        int[] baseGreenY = new int[]{
+                180, 162, 180, 198
+        };
+
+
         List<BeanCell> resultBeansCells = new ArrayList<>();
         int i;
         for (i = 0; i < x.length; i++) {
@@ -119,58 +148,18 @@ public class BeanBoard {
         return resultBeansCells;
     }
 
-    public static int getRealStep(int currentIndex, int step, int color) {
-        int result = -1;
-        BeanCell beanCell = getAllBeanCell().get(currentIndex);
 
-        if (currentIndex >= 60 && currentIndex < 70) {
-            result = 67 - (currentIndex + step) % 67;
-        } else if (currentIndex >= 70 && currentIndex < 80) {
-            result = 77 - (currentIndex + step) % 77;
-        } else if (currentIndex >= 80 && currentIndex < 90) {
-            result = 87 - (currentIndex + step) % 87;
-        } else if (currentIndex >= 90 && currentIndex < 100) {
-            result = 97 - (currentIndex + step) % 97;
-        } else {
-            currentIndex += step;
-            if (beanCell.color == color) {
-                if (color == BeanCell.COLOR_BLUE) {
-                    if (currentIndex == 16) {
-                        result = currentIndex + 12;
-                    } else {
-                        result = currentIndex + 4;
-                    }
-                } else if (color == BeanCell.COLOR_RED) {
-                    if (currentIndex == 29) {
-                        result = currentIndex + 12;
-                    } else {
-                        result = currentIndex + 4;
-                    }
-
-                } else if (color == BeanCell.COLOR_YELLOW) {
-                    if (currentIndex == 42) {
-                        result = currentIndex + 12;
-                    } else {
-                        result = currentIndex + 4;
-                    }
-
-                } else {
-                    if (currentIndex == 3) {
-                        result = currentIndex + 12;
-                    } else {
-                        result = currentIndex + 4;
-                    }
-                }
-                result %= 52;
-            } else {
-                result = currentIndex%52;
-            }
-        }
-
-
-        Log.d("test", "currentIdndex :" + result);
-        return result;
+    public static List<BeanRole> getRoleList() {
+        List<BeanRole> list = new ArrayList<>();
+        BeanRole blue = new BeanRole(BeanCell.COLOR_BLUE);
+        BeanRole red = new BeanRole(BeanCell.COLOR_RED);
+        BeanRole yello = new BeanRole(BeanCell.COLOR_YELLOW);
+        BeanRole green = new BeanRole(BeanCell.COLOR_GREEN);
+        list.add(blue);
+        list.add(red);
+        list.add(yello);
+        list.add(green);
+        return list;
     }
-
 
 }
