@@ -66,11 +66,13 @@ public class BeanPlane {
      */
     public BeanPlane(int index, int status, int color, Button btn, boolean clickable) {
         mBeanCells = BeanBoard.getAllBeanCell();
-        currentIndex = index;
+        BeanCell cell = mBeanCells.get(index);
         mStatus = status;
         this.color = color;
         this.btn = btn;
-        btn.setClickable(clickable);
+        this.btn.setX(cell.getX());
+        this.btn.setY(cell.getY());
+        this.btn.setClickable(clickable);
     }
 
     public int getStatus() {

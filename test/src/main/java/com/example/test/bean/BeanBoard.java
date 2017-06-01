@@ -11,8 +11,10 @@ import java.util.List;
  */
 public class BeanBoard {
 
+
     public static List<BeanCell> getAllBeanCell() {
 
+        List<BeanCell> resultBeansCells = new ArrayList<>();
         int[] x = new int[]{
                 398, 372, 346,
                 294, 268, 242,
@@ -100,18 +102,21 @@ public class BeanBoard {
         int[] baseGreenY = new int[]{
                 180, 162, 180, 198
         };
-
-
-        List<BeanCell> resultBeansCells = new ArrayList<>();
         int i;
         for (i = 0; i < x.length; i++) {
             int color = i % 4;
             BeanCell beanCell = new BeanCell(x[i], y[i], color);
             resultBeansCells.add(beanCell);
         }
+        /*
+        常规外围位置
+         */
         for (; i < 60; i++) {
             resultBeansCells.add(null);
         }
+        /*
+        结束跑道位置
+         */
         for (; i < 70; i++) {
             if (i < 67) {
                 int temp = i - 60;
@@ -145,6 +150,24 @@ public class BeanBoard {
             }
         }
 
+        /*
+        基地位置
+         */
+        for (; i < 116; i++) {
+            if (i < 104) {
+                int index = i - 100;
+                resultBeansCells.add(new BeanCell(baseBlueX[index], baseBlueY[index], BeanCell.COLOR_BLUE));
+            } else if (i < 108) {
+                int index = i - 104;
+                resultBeansCells.add(new BeanCell(baseRedX[index], baseRedY[index], BeanCell.COLOR_RED));
+            } else if (i < 112) {
+                int index = i - 108;
+                resultBeansCells.add(new BeanCell(baseYellowX[index], baseYellowY[index], BeanCell.COLOR_YELLOW));
+            } else  {
+                int index = i - 112;
+                resultBeansCells.add(new BeanCell(baseGreenX[index], baseGreenY[index], BeanCell.COLOR_GREEN));
+            }
+        }
         return resultBeansCells;
     }
 

@@ -20,6 +20,7 @@ import com.example.test.bean.BeanCell;
 import com.example.test.bean.BeanPlane;
 import com.example.test.bean.BeanRole;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -28,6 +29,8 @@ import java.util.Random;
  * @created 2017/5/24
  */
 public class AtyTest extends AppCompatActivity {
+
+    public static final int PLANE_TO_START = 6;
 
     private Button mBtnDice;
 
@@ -55,16 +58,22 @@ public class AtyTest extends AppCompatActivity {
     private Button mBtnGreen3;
 
 
-    private Button[] mBtnsBlue = new Button[]{mBtnBlue0, mBtnBlue1, mBtnBlue2, mBtnBlue3};
-    private Button[] mBtnsRed = new Button[]{mBtnRed0, mBtnRed1, mBtnRed2, mBtnRed3};
-    private Button[] mBtnsYellow = new Button[]{mBtnYellow0, mBtnYellow1, mBtnYellow2, mBtnYellow3};
+    private Button[] mBtnsBlue;
+    private Button[] mBtnsRed;
+    private Button[] mBtnsYellow;
+    private Button[] mBtnsGreen;
 
+    private int[] mIDBlue = new int[]{R.id.btn_blue_0, R.id.btn_blue_1, R.id.btn_blue_2, R.id.btn_blue_3};
+    private int[] mIDRed = new int[]{R.id.btn_red_0, R.id.btn_red_1, R.id.btn_red_2, R.id.btn_red_3};
+    private int[] mIDYellow = new int[]{R.id.btn_yellow_0, R.id.btn_yellow_1, R.id.btn_yellow_2, R.id.btn_yellow_3,};
+    private int[] mIDGreen = new int[]{R.id.btn_green_0, R.id.btn_green_1, R.id.btn_green_2, R.id.btn_green_3};
 
-    private Button[] mBtnsGreen = new Button[]{mBtnGreen0, mBtnGreen1, mBtnGreen2, mBtnGreen3};
 
     private float mXScale = 0;
     private float mYScale = 0;
 
+
+    private HashMap<Integer, BeanPlane> mIdMap;
     private List<BeanCell> mBeanCellList;
     private List<BeanRole> mBeanRoleList;
     private boolean isFinish = false;
@@ -79,6 +88,7 @@ public class AtyTest extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.aty_test);
+        mIdMap = new HashMap<>();
         //比例
         getScale();
 
@@ -87,9 +97,12 @@ public class AtyTest extends AppCompatActivity {
         mBeanRoleList = BeanBoard.getRoleList();
         findview();
         initRoleAndPlanes();
-
-
         toggleHideyBar();
+
+        final BeanRole currentRole = mBeanRoleList.get(mCurrent);
+        currentRole.setBtnDice(mBtnDice);
+        currentRole.getBtnDice().setClickable(true);
+
 
         /**
          * 抛色子
@@ -101,32 +114,27 @@ public class AtyTest extends AppCompatActivity {
                 Random rand = new Random();
                 mDice = (rand.nextInt(6) + 1);
                 mBtnDice.setText(mDice + "");
+
+                if (currentRole.isAllPlanesInBase()) {
+                    if (mDice == PLANE_TO_START) {
+                        // TODO: 2017/6/1 飞机除了已经结束的全部可点击
+                        currentRole.movePlaneRoadAndBase();
+                    }
+                } else {
+                    // TODO: 2017/6/1 获取所有不在基地的飞机可点击
+                    currentRole.movePlaneRoad();
+                }
+                if (currentRole.isAllPlanesInEnd()) {
+                    toast("游戏结束！");
+                    isFinish = true;
+                } else {
+                    mCurrent = (mCurrent + 1) % 4;
+                }
             }
 
         });
     }
 
-
-    //                BeanRole currentRole = mBeanRoleList.get(mCurrent);
-//                if (!currentRole.isFinish()) {
-//                    currentRole.setNum(temp);
-//                    if (!currentRole.isNormalEnd()) {
-//                        Log.d("test", "角色：" + mCurrent + "  before normalmove " + currentRole.getCurrentIndex() + " 色子：" + temp);
-//                        currentRole.normalMove();
-//                        Log.d("test", "角色：" + mCurrent + "  after normalmove " + currentRole.getCurrentIndex());
-//                    } else {
-//                        currentRole.endMove();
-//                        Log.d("test", "角色：" + mCurrent + "  currentIndexInEnd:" + currentRole.getCurrentIndex());
-//                        if (currentRole.isFinish() == true) {
-//                            isFinish = true;
-//                        }
-//                    }
-//                }
-//                if (isFinish == true) {
-//                    toast("游戏结束");
-//                } else {
-//                    mCurrent = (mCurrent + 1) % 4;
-//                }
 
     private void findview() {
         mBtnDice = (Button) findViewById(R.id.btn_click);
@@ -151,8 +159,16 @@ public class AtyTest extends AppCompatActivity {
         mBtnGreen1 = (Button) findViewById(R.id.btn_green_1);
         mBtnGreen2 = (Button) findViewById(R.id.btn_green_2);
         mBtnGreen3 = (Button) findViewById(R.id.btn_green_3);
+        mBtnsBlue = new Button[]{mBtnBlue0, mBtnBlue1, mBtnBlue2, mBtnBlue3};
+        mBtnsRed = new Button[]{mBtnRed0, mBtnRed1, mBtnRed2, mBtnRed3};
+        mBtnsYellow = new Button[]{mBtnYellow0, mBtnYellow1, mBtnYellow2, mBtnYellow3};
+        mBtnsGreen = new Button[]{mBtnGreen0, mBtnGreen1, mBtnGreen2, mBtnGreen3};
+
     }
 
+    /**
+     * 初始化飞机位置
+     */
     private void initRoleAndPlanes() {
         int index = 100;
         for (int i = 0; i < mBeanRoleList.size(); i++) {
@@ -161,33 +177,39 @@ public class AtyTest extends AppCompatActivity {
             List<BeanPlane> planes = role.getAllPlanes();
             if (i == BeanCell.COLOR_BLUE) {
                 for (int j = 0; j <= mBtnsBlue.length; j++) {
-                    BeanPlane plane = new BeanPlane(index++, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_BLUE, mBtnsBlue[i], false);
-                    setScale(plane, mXScale, mYScale);
+                    BeanPlane plane = new BeanPlane(index++, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_BLUE, mBtnsBlue[j], false);
+                    setPlaneScale(plane, mXScale, mYScale);
+                    mIdMap.put(mIDBlue[i], plane);
                     planes.add(plane);
                 }
             } else if (i == BeanCell.COLOR_RED) {
                 for (int j = 0; j <= mBtnsBlue.length; j++) {
-                    BeanPlane plane = new BeanPlane(index++, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_RED, mBtnsRed[i], false);
-                    setScale(plane, mXScale, mYScale);
+                    BeanPlane plane = new BeanPlane(index++, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_RED, mBtnsRed[j], false);
+                    mIdMap.put(mIDRed[i], plane);
+                    setPlaneScale(plane, mXScale, mYScale);
                     planes.add(plane);
                 }
             } else if (i == BeanCell.COLOR_YELLOW) {
                 for (int j = 0; j <= mBtnsBlue.length; j++) {
-                    BeanPlane plane = new BeanPlane(index++, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_YELLOW, mBtnsYellow[i], false);
-                    setScale(plane, mXScale, mYScale);
+                    BeanPlane plane = new BeanPlane(index++, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_YELLOW, mBtnsYellow[j], false);
+                    mIdMap.put(mIDYellow[i], plane);
+                    setPlaneScale(plane, mXScale, mYScale);
                     planes.add(plane);
                 }
             } else if (i == BeanCell.COLOR_GREEN) {
                 for (int j = 0; j <= mBtnsBlue.length; j++) {
-                    BeanPlane plane = new BeanPlane(index++, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_GREEN, mBtnsGreen[i], false);
-                    setScale(plane, mXScale, mYScale);
+                    BeanPlane plane = new BeanPlane(index++, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_GREEN, mBtnsGreen[j], false);
+                    mIdMap.put(mIDGreen[i], plane);
+                    setPlaneScale(plane, mXScale, mYScale);
                     planes.add(plane);
-
                 }
             }
         }
     }
 
+    /**
+     * 获取屏幕比例
+     */
     private void getScale() {
         Point point = new Point();
         getWindowManager().getDefaultDisplay().getRealSize(point);
@@ -197,7 +219,13 @@ public class AtyTest extends AppCompatActivity {
         mXScale = width / 640;
     }
 
-    private void setScale(BeanPlane plane, float x, float y) {
+    /**
+     * @param plane
+     * @param x
+     * @param y
+     */
+
+    private void setPlaneScale(BeanPlane plane, float x, float y) {
         plane.setXScale(x);
         plane.setYScale(y);
     }
@@ -207,29 +235,27 @@ public class AtyTest extends AppCompatActivity {
     }
 
 
+    /**
+     * 点击任意可与点击的飞机
+     *
+     * @param v
+     */
     public void btnOnClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_blue_0:
-            case R.id.btn_blue_1:
-            case R.id.btn_blue_2:
-            case R.id.btn_blue_3:
-
-            case R.id.btn_red_0:
-            case R.id.btn_red_1:
-            case R.id.btn_red_2:
-            case R.id.btn_red_3:
-
-            case R.id.btn_yellow_0:
-            case R.id.btn_yellow_1:
-            case R.id.btn_yellow_2:
-            case R.id.btn_yellow_3:
-
-            case R.id.btn_green_0:
-            case R.id.btn_green_1:
-            case R.id.btn_green_2:
-            case R.id.btn_green_3:
-
+        int id = v.getId();
+        BeanPlane plane = mIdMap.get(id);
+        if (!plane.isFinish()) {
+            plane.setNum(mDice);
+            if (!plane.isNormalEnd()) {
+                plane.normalMove();
+                plane.setStatus(BeanPlane.STATUS_ON_ROAD);
+            } else {
+                plane.endMove();
+                if (plane.isFinish()) {
+                    plane.setStatus(BeanPlane.STATUS_IN_END);
+                }
+            }
         }
+
     }
 
 
@@ -260,6 +286,4 @@ public class AtyTest extends AppCompatActivity {
 
         getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
     }
-
-
 }
