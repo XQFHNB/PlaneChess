@@ -31,6 +31,7 @@ import java.util.Random;
 public class AtyTest extends AppCompatActivity {
 
     public static final int PLANE_TO_START = 6;
+    public static final String TAG = "test";
 
     private Button mBtnDice;
 
@@ -76,6 +77,7 @@ public class AtyTest extends AppCompatActivity {
     private HashMap<Integer, BeanPlane> mIdMap;
     private List<BeanCell> mBeanCellList;
     private List<BeanRole> mBeanRoleList;
+    //    private List<BeanPlane> mBeanPlanes;
     private boolean isFinish = false;
 
     private int mDice = -1;
@@ -99,9 +101,9 @@ public class AtyTest extends AppCompatActivity {
         initRoleAndPlanes();
         toggleHideyBar();
 
-        final BeanRole currentRole = mBeanRoleList.get(mCurrent);
-        currentRole.setBtnDice(mBtnDice);
-        currentRole.getBtnDice().setClickable(true);
+//        final BeanRole currentRole = mBeanRoleList.get(mCurrent);
+//        currentRole.setBtnDice(mBtnDice);
+//        currentRole.getBtnDice().setClickable(true);
 
 
         /**
@@ -111,17 +113,28 @@ public class AtyTest extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Random rand = new Random();
-                mDice = (rand.nextInt(6) + 1);
+//                Random rand = new Random();
+//                mDice = (rand.nextInt(6) + 1);
+                mDice = 6;
                 mBtnDice.setText(mDice + "");
 
+                BeanRole currentRole = mBeanRoleList.get(mCurrent);
+                currentRole.setBtnDice(mBtnDice);
+                currentRole.getBtnDice().setClickable(true);
                 if (currentRole.isAllPlanesInBase()) {
+                    Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机都在基地");
                     if (mDice == PLANE_TO_START) {
                         // TODO: 2017/6/1 飞机除了已经结束的全部可点击
                         currentRole.movePlaneRoadAndBase();
+                        Log.d(TAG, "当前用户: " + currentRole.getColor() + " 抛出了启动色子，所有的飞机包括在基地的飞机都可以点击");
+                    } else {
+                        Log.d(TAG, "当前用户: " + currentRole.getColor() + " 没有抛出启动色子，并且所有的飞机都在基地，没有办法起飞，直接下一位");
+                        mCurrent = (mCurrent + 1) % 4;
+                        return;
                     }
                 } else {
                     // TODO: 2017/6/1 获取所有不在基地的飞机可点击
+                    Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机不都在基地,可以点击不是在基地和终点的飞机");
                     currentRole.movePlaneRoad();
                 }
                 if (currentRole.isAllPlanesInEnd()) {
@@ -172,36 +185,43 @@ public class AtyTest extends AppCompatActivity {
     private void initRoleAndPlanes() {
         int index = 100;
         for (int i = 0; i < mBeanRoleList.size(); i++) {
-            BeanRole role = new BeanRole(mColors[i]);
+            BeanRole role = mBeanRoleList.get(i);
             role.setBtnDice(mBtnDice);
-            List<BeanPlane> planes = role.getAllPlanes();
+            List<BeanPlane> mBeanPlanes = role.getAllPlanes();
             if (i == BeanCell.COLOR_BLUE) {
-                for (int j = 0; j <= mBtnsBlue.length; j++) {
-                    BeanPlane plane = new BeanPlane(index++, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_BLUE, mBtnsBlue[j], false);
+                for (int j = 0; j < mBtnsBlue.length; j++) {
+                    BeanPlane plane = new BeanPlane(index++, 0, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_BLUE, mBtnsBlue[j], false);
                     setPlaneScale(plane, mXScale, mYScale);
-                    mIdMap.put(mIDBlue[i], plane);
-                    planes.add(plane);
+                    mIdMap.put(mIDBlue[j], plane);
+                    mBeanPlanes.add(plane);
+                    role.setAllPlanes(mBeanPlanes);
                 }
             } else if (i == BeanCell.COLOR_RED) {
-                for (int j = 0; j <= mBtnsBlue.length; j++) {
-                    BeanPlane plane = new BeanPlane(index++, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_RED, mBtnsRed[j], false);
-                    mIdMap.put(mIDRed[i], plane);
+//                mBeanPlanes = role.getAllPlanes();
+                for (int j = 0; j < mBtnsBlue.length; j++) {
+                    BeanPlane plane = new BeanPlane(index++, 13, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_RED, mBtnsRed[j], false);
+                    mIdMap.put(mIDRed[j], plane);
                     setPlaneScale(plane, mXScale, mYScale);
-                    planes.add(plane);
+                    mBeanPlanes.add(plane);
+                    role.setAllPlanes(mBeanPlanes);
                 }
             } else if (i == BeanCell.COLOR_YELLOW) {
-                for (int j = 0; j <= mBtnsBlue.length; j++) {
-                    BeanPlane plane = new BeanPlane(index++, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_YELLOW, mBtnsYellow[j], false);
-                    mIdMap.put(mIDYellow[i], plane);
+//                mBeanPlanes = role.getAllPlanes();
+                for (int j = 0; j < mBtnsBlue.length; j++) {
+                    BeanPlane plane = new BeanPlane(index++, 26, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_YELLOW, mBtnsYellow[j], false);
+                    mIdMap.put(mIDYellow[j], plane);
                     setPlaneScale(plane, mXScale, mYScale);
-                    planes.add(plane);
+                    mBeanPlanes.add(plane);
+                    role.setAllPlanes(mBeanPlanes);
                 }
             } else if (i == BeanCell.COLOR_GREEN) {
-                for (int j = 0; j <= mBtnsBlue.length; j++) {
-                    BeanPlane plane = new BeanPlane(index++, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_GREEN, mBtnsGreen[j], false);
-                    mIdMap.put(mIDGreen[i], plane);
+//                mBeanPlanes = role.getAllPlanes();
+                for (int j = 0; j < mBtnsBlue.length; j++) {
+                    BeanPlane plane = new BeanPlane(index++, 39, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_GREEN, mBtnsGreen[j], false);
+                    mIdMap.put(mIDGreen[j], plane);
                     setPlaneScale(plane, mXScale, mYScale);
-                    planes.add(plane);
+                    mBeanPlanes.add(plane);
+                    role.setAllPlanes(mBeanPlanes);
                 }
             }
         }
@@ -285,5 +305,19 @@ public class AtyTest extends AppCompatActivity {
         }
 
         getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+        for (int i = 0; i < mBeanRoleList.size(); i++) {
+            BeanRole role = mBeanRoleList.get(i);
+            List<BeanPlane> planes = role.getAllPlanes();
+            for (int j = 0; j < planes.size(); j++) {
+                planes.get(j).init();
+            }
+        }
+
     }
 }

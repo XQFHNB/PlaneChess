@@ -38,6 +38,10 @@ public class BeanRole {
         return mBeanPlanes;
     }
 
+    public void setAllPlanes(List<BeanPlane> list) {
+        mBeanPlanes = list;
+    }
+
 
     public int getColor() {
         return mColor;
@@ -139,8 +143,8 @@ public class BeanRole {
         List<BeanPlane> beanPlanesOnRoad = getBeanPlanesOnTheRoad();
         List<BeanPlane> beanPlanesInBase = getBeanPlanesInBase();
         beanPlanesInBase.addAll(beanPlanesOnRoad);
-        for (int i = 0; i < beanPlanesOnRoad.size(); i++) {
-            Button btn = beanPlanesOnRoad.get(i).getBtn();
+        for (int i = 0; i <  beanPlanesInBase.size(); i++) {
+            Button btn =  beanPlanesInBase.get(i).getBtn();
             btn.setClickable(true);
         }
     }

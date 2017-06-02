@@ -80,7 +80,7 @@ public class BeanBoard {
                 286, 320, 354, 320,
         };
         int[] baseBlueY = new int[]{
-                324, 306, 324, 306
+                324, 306, 324, 342
         };
 
         int[] baseRedX = new int[]{
@@ -157,13 +157,13 @@ public class BeanBoard {
             if (i < 104) {
                 int index = i - 100;
                 resultBeansCells.add(new BeanCell(baseBlueX[index], baseBlueY[index], BeanCell.COLOR_BLUE));
-            } else if (i < 108) {
+            } else if (i >= 104 && i < 108) {
                 int index = i - 104;
                 resultBeansCells.add(new BeanCell(baseRedX[index], baseRedY[index], BeanCell.COLOR_RED));
-            } else if (i < 112) {
+            } else if (i >= 108 && i < 112) {
                 int index = i - 108;
                 resultBeansCells.add(new BeanCell(baseYellowX[index], baseYellowY[index], BeanCell.COLOR_YELLOW));
-            } else  {
+            } else if (i >= 112) {
                 int index = i - 112;
                 resultBeansCells.add(new BeanCell(baseGreenX[index], baseGreenY[index], BeanCell.COLOR_GREEN));
             }

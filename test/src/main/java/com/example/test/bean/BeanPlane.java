@@ -10,6 +10,7 @@ import java.util.List;
  * @created 2017/5/31
  */
 public class BeanPlane {
+    public static final String TAG = "test";
 
     public static final int START_BLUE_NORMAL = 0;
     public static final int START_RED_NORMAL = 13;
@@ -49,12 +50,14 @@ public class BeanPlane {
     private int currentIndexInEnd;
     private float mXScale = 0;
     private float mYScale = 0;
+    private int mBasePlaneIndex = 0;
     private int mNum;
     private boolean isFinish = false;
     private boolean isNormalEnd = false;
     private List<BeanCell> mBeanCells;
     private int mStatus;
     private Button btn;
+
 
     /**
      * 飞机初始化
@@ -64,15 +67,31 @@ public class BeanPlane {
      * @param color     飞机的颜色
      * @param clickable 是否可点击
      */
-    public BeanPlane(int index, int status, int color, Button btn, boolean clickable) {
+    public BeanPlane(int index, int startIndex, int status, int color, Button btn, boolean clickable) {
+        currentIndex = startIndex;
+        this.btn = btn;
+        mBasePlaneIndex = index;
         mBeanCells = BeanBoard.getAllBeanCell();
-        BeanCell cell = mBeanCells.get(index);
         mStatus = status;
         this.color = color;
-        this.btn = btn;
-        this.btn.setX(cell.getX());
-        this.btn.setY(cell.getY());
         this.btn.setClickable(clickable);
+    }
+
+    public void init() {
+        BeanCell cell = mBeanCells.get(mBasePlaneIndex);
+        int dx = cell.getX();
+        int dy = cell.getY();
+        btn.setX((dx - x) * mXScale);
+        btn.setY((dy - 2 * x) * mYScale);
+    }
+
+
+    public int getBasePlaneIndex() {
+        return mBasePlaneIndex;
+    }
+
+    public void setBasePlaneIndex(int basePlaneIndex) {
+        mBasePlaneIndex = basePlaneIndex;
     }
 
     public int getStatus() {
@@ -177,12 +196,16 @@ public class BeanPlane {
      */
     public void normalMove() {
         if (color == BeanCell.COLOR_BLUE) {
+            Log.d(TAG, "蓝色飞机正常移动");
             blueNormalMove();
         } else if (color == BeanCell.COLOR_RED) {
+            Log.d(TAG, "红色飞机正常移动");
             redNormalMove();
         } else if (color == BeanCell.COLOR_YELLOW) {
+            Log.d(TAG, "黄色飞机正常移动");
             yellowNormalMove();
         } else {
+            Log.d(TAG, "绿色飞机正常移动");
             greenNormalMove();
         }
 
@@ -194,12 +217,16 @@ public class BeanPlane {
 
     public void endMove() {
         if (color == BeanCell.COLOR_BLUE) {
+            Log.d(TAG, "蓝色飞机结束跑道上移动");
             blueEndMove();
         } else if (color == BeanCell.COLOR_RED) {
+            Log.d(TAG, "红色飞机结束跑道上移动");
             redEndMove();
         } else if (color == BeanCell.COLOR_YELLOW) {
+            Log.d(TAG, "黄色飞机结束跑道上移动");
             yellowEndMove();
         } else {
+            Log.d(TAG, "绿色飞机结束跑道上移动");
             greenEndMove();
         }
     }
