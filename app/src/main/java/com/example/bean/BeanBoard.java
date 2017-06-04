@@ -1,11 +1,11 @@
-package com.example.test.bean;
+package com.example.bean;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author XQF
- * @created 2017/5/24
+ * @created 2017/6/4
  */
 public class BeanBoard {
 
