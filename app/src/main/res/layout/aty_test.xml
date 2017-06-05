@@ -1,7 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:background="@drawable/boardnoposition"
+              android:orientation="vertical">
 
+    <Button
+        android:id="@+id/btn_click"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="点击"/>
+
+    <Button
+        android:id="@+id/btn_blue_0"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_blue"
+        android:onClick="btnOnClick"
+        />
+
+    <Button
+        android:id="@+id/btn_blue_1"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_blue"
+        android:onClick="btnOnClick"
+        />
+
+    <Button
+        android:id="@+id/btn_blue_2"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_blue"
+        android:onClick="btnOnClick"
+        />
+
+    <Button
+        android:id="@+id/btn_blue_3"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_blue"
+        android:onClick="btnOnClick"
+        />
+
+    <Button
+        android:id="@+id/btn_red_0"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_red"
+        android:onClick="btnOnClick"
+        />
+
+    <Button
+        android:id="@+id/btn_red_1"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_red"
+        android:onClick="btnOnClick"
+        />
+
+    <Button
+        android:id="@+id/btn_red_2"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_red"
+        android:onClick="btnOnClick"
+        />
+
+    <Button
+        android:id="@+id/btn_red_3"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_red"
+        android:onClick="btnOnClick"
+        />
+
+    <Button
+        android:id="@+id/btn_yellow_0"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_yellow"
+        android:onClick="btnOnClick"
+        />
+
+    <Button
+        android:id="@+id/btn_yellow_1"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_yellow"
+        android:onClick="btnOnClick"
+        />
+
+    <Button
+        android:id="@+id/btn_yellow_2"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_yellow"
+        android:onClick="btnOnClick"
+        />
+
+    <Button
+        android:id="@+id/btn_yellow_3"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_yellow"
+        android:onClick="btnOnClick"
+        />
+
+    <Button
+        android:id="@+id/btn_green_0"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_green"
+        android:onClick="btnOnClick"
+        />
+
+    <Button
+        android:id="@+id/btn_green_1"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_green"
+        android:onClick="btnOnClick"
+        />
+
+    <Button
+        android:id="@+id/btn_green_2"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_green"
+        android:onClick="btnOnClick"
+        />
+
+    <Button
+        android:id="@+id/btn_green_3"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/plane_green"
+        android:onClick="btnOnClick"
+        />
 </LinearLayout>

@@ -37,7 +37,6 @@ import java.util.List;
 public class AtyGameClient extends AppCompatActivity {
     public static void startAtyGameClient(Context context, Class<?> cls, Client client, String roomIp, int index) {
         Intent intent = new Intent(context, cls);
-//        intent.putExtra("client", client);
         intent.putExtra("roomip", roomIp);
         intent.putExtra("index", index);
         context.startActivity(intent);
@@ -116,6 +115,7 @@ public class AtyGameClient extends AppCompatActivity {
     //色子数字
     private int mDice = -1;
     private int mCurrent = 0;
+    private int mNextRole = 0;
     private int mIndex = 0;
     private boolean isFinish = false;
 
@@ -138,11 +138,11 @@ public class AtyGameClient extends AppCompatActivity {
                 // TODO: 2017/6/4 移动棋子
                 movePlane(mIdBtnClicked, mStart, mEnd);
                 mBtnDice.setText(mDice + " ");
-                toast("下一位" + mCurrent + "的回合");
+                toast("下一位" + mNextRole + "的回合");
             } else if (what == WHAT_MOVE_NO) {//服务器发来信息的客户端没有启动，但是还是要设置一下色子数字---------------------------------------------------------------
                 // TODO: 2017/6/4 移动棋子
                 mBtnDice.setText(mDice + " ");
-                toast("下一位" + mCurrent + "的回合");
+                toast("下一位" + mNextRole + "的回合");
 
             } else if (what == WHAT_MOVE_END) {//服务器发来的游戏结束的消息，收到消息后进行对应调整，停止客户端的接收线程---------------------------------------------------
                 mThreadClientGame.stopGetData();
@@ -151,7 +151,7 @@ public class AtyGameClient extends AppCompatActivity {
             }
 
             //若服务器附带的消息表明本客户端就是接下来应该表演的客户端，于是提示用户，并进行相应设置，比如设置色子可点击--------------------------------------------------------
-            if (mCurrent == mIndex) {
+            if (mNextRole == mIndex) {
                 mBtnDice.setClickable(true);
                 toast("请开始你的表演");
             }
@@ -164,7 +164,6 @@ public class AtyGameClient extends AppCompatActivity {
         Button btn = plane.getBtn();
         BeanCell cell = mBeanCellList.get(end);
         int x = 3;
-//        Log.d("test", "move方法中的temp:" + temp);
         float destX = (cell.getX() - x) * mXScale;
         float destY = (cell.getY() - 2 * x) * mYScale;
         btn.setX(destX);
@@ -175,16 +174,15 @@ public class AtyGameClient extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.aty_game_sever);
-        mClient = (Client) getIntent().getSerializableExtra("client");
+//        mClient = (Client) getIntent().getSerializableExtra("client");
         mRoomIp = getIntent().getStringExtra("roomip");
         mIndex = getIntent().getIntExtra("index", 0);
 
-//        try {
-//            mClient=Client.newInstance(InetAddress.getByName(mRoomIp),SOCKET_PORT);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        // TODO: 2017/6/4 点击色子并点击飞机进行移动，向服务器发送本次移动的所有信息
+        try {
+            mClient = Client.newInstance(InetAddress.getByName(mRoomIp), SOCKET_PORT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         mThreadClientGame = new ThreadClientGame();
         mThreadClientGame.start();
@@ -212,7 +210,6 @@ public class AtyGameClient extends AppCompatActivity {
                 if (currentRole.isAllPlanesInBase()) {
                     Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机都在基地");
                     if (mDice == PLANE_TO_START) {
-                        // TODO: 2017/6/1 飞机除了已经结束的全部可点击
                         currentRole.movePlaneRoadAndBase();
                         Log.d(TAG, "当前用户: " + currentRole.getColor() + " 抛出了启动色子，所有的飞机包括在基地的飞机都可以点击");
                     } else {
@@ -220,7 +217,7 @@ public class AtyGameClient extends AppCompatActivity {
 
 
                         //向服务器发送不动的消息------------------------------------------------------------------------------------------------------
-                        DataBroaCastSerlied dataToSever = new DataBroaCastSerlied(MOVE_NO, mRoomIp, mDice, 0, 0, 0, 0);
+                        DataBroaCastSerlied dataToSever = new DataBroaCastSerlied(MOVE_NO, mRoomIp, mDice, 0, 0, 0, 0, 0);
                         MsgNet msg = new MsgNet(dataToSever.toString(), (byte) 0x00);
                         try {
                             mClient.sendToServer(msg);
@@ -232,7 +229,6 @@ public class AtyGameClient extends AppCompatActivity {
 
                     }
                 } else {
-                    // TODO: 2017/6/1 获取所有不在基地的飞机可点击
                     Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机不都在基地,可以点击不是在基地和终点的飞机");
                     currentRole.movePlaneRoad();
                 }
@@ -241,7 +237,7 @@ public class AtyGameClient extends AppCompatActivity {
 
 
                     //向服务器发送游戏结束的消息---------------------------------------------------------------------------------------------------------
-                    DataBroaCastSerlied dataToSever = new DataBroaCastSerlied(MOVE_END, mRoomIp, mDice, 0, 0, 0, 0);
+                    DataBroaCastSerlied dataToSever = new DataBroaCastSerlied(MOVE_END, mRoomIp, mDice, 0, 0, 0, 0, 0);
                     MsgNet msg = new MsgNet(dataToSever.toString(), (byte) 0x00);
                     try {
                         mClient.sendToServer(msg);
@@ -254,8 +250,8 @@ public class AtyGameClient extends AppCompatActivity {
                 } else {
 
                     //向服务器发送本client移动飞机的位置信息--------------------------------------------------------------------------------------------
-                    DataBroaCastSerlied dataToSever = new DataBroaCastSerlied(MOVE_PLANE, mRoomIp, mDice, mIdBtnClicked, 0, indexPlaneEnd, 0);
-                    MsgNet msg = new MsgNet(dataToSever.toString(), (byte) 0x00);
+                    DataBroaCastSerlied dataToSever = new DataBroaCastSerlied(MOVE_PLANE, mRoomIp, mDice, mIdBtnClicked, 0, indexPlaneEnd, 0, 0);
+                    MsgNet msg = new MsgNet(dataToSever.getGameData(), (byte) 0x00);
                     try {
                         mClient.sendToServer(msg);
                     } catch (SocketException e) {
@@ -290,14 +286,13 @@ public class AtyGameClient extends AppCompatActivity {
                     String roomIpFromSever = gameDataFormSever.getRoomIP();
                     String tagFromSever = gameDataFormSever.getTag();
                     if (roomIpFromSever.startsWith(mRoomIp)) {
-
                         if (tagFromSever.startsWith(MOVE_PLANE)) {//接收服务器发来的移动飞机的信息，包括设置色子数字和-飞机位置---------------------------------------------------------------------
                             message.what = WHAT_MOVE_PLAEN;
                             mDice = gameDataFormSever.getDice();
                             mIdBtnClicked = gameDataFormSever.getIdPlane();
                             mStart = gameDataFormSever.getStartIndex();
                             mEnd = gameDataFormSever.getEndIndex();
-                            mCurrent = gameDataFormSever.getNextRole();
+                            mNextRole = gameDataFormSever.getNextRole();
                         } else if (tagFromSever.startsWith(MOVE_NO)) {//接收服务器发来的不移动飞机的信息，但是要设置色子的数字---------------------------------------------------------
                             message.what = WHAT_MOVE_NO;
                             mDice = gameDataFormSever.getDice();

@@ -45,8 +45,10 @@ public class UtilDeserializable {
         int planeId = Integer.parseInt(strs[3]);
         int start = Integer.parseInt(strs[4]);
         int end = Integer.parseInt(strs[5]);
-        int nextRole = Integer.parseInt(strs[6]);
-        return new DataBroaCastSerlied(tag, roomIp, dice, planeId, start, end, nextRole);
+
+        int currentRole = Integer.parseInt(strs[6]);
+        int nextRole = Integer.parseInt(strs[7]);
+        return new DataBroaCastSerlied(tag, roomIp, dice, planeId, start, end, currentRole, nextRole);
     }
 
 }

@@ -165,7 +165,7 @@ public class AtyGameSever extends AppCompatActivity {
         setContentView(R.layout.aty_game_sever);
 //        mServerInTele = (ServerInTele) getIntent().getSerializableExtra("sever");
         try {
-            mServerInTele=ServerInTele.newInstance(MAXPLAYER,PORT);
+            mServerInTele = ServerInTele.newInstance(MAXPLAYER, PORT);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -208,20 +208,16 @@ public class AtyGameSever extends AppCompatActivity {
                     } else {
                         Log.d(TAG, "当前用户: " + currentRole.getColor() + " 没有抛出启动色子，并且所有的飞机都在基地，没有办法起飞，直接下一位");
 
-                        // TODO: 2017/6/4 服务器发消息
-
 
                         //向所有的客户端发送消息,消息内容包括行为命令以及下一位用户的index-----------------------------------------------------------------------
-                        mCurrent = (mCurrent + 1) % 4;
-                        DataBroaCastSerlied gameDataToAllClients = new DataBroaCastSerlied(MOVE_NO, mRoomIp, mDice, 0, 0, 0, mCurrent);
+                        int mNextRole = (mCurrent + 1) % 4;
+                        DataBroaCastSerlied gameDataToAllClients = new DataBroaCastSerlied(MOVE_NO, mRoomIp, mDice, 0, 0, 0, mCurrent, mNextRole);
                         MsgNet msg = new MsgNet(gameDataToAllClients.toString(), (byte) 0x00);
                         mServerInTele.sendToAll(msg);
-
-
+                        mCurrent = mNextRole;
                         return;
                     }
                 } else {
-                    // TODO: 2017/6/1 获取所有不在基地的飞机可点击
                     Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机不都在基地,可以点击不是在基地和终点的飞机");
                     currentRole.movePlaneRoad();
                 }
@@ -230,7 +226,7 @@ public class AtyGameSever extends AppCompatActivity {
                 if (currentRole.isAllPlanesInEnd()) {
                     //向所有客户端发送游戏结束的消息----------------------------------------------------------------------------------------------------------
                     toast("游戏结束！");
-                    DataBroaCastSerlied gameDataToAllClients = new DataBroaCastSerlied(MOVE_END, mRoomIp, mDice, 0, 0, 0, 0);
+                    DataBroaCastSerlied gameDataToAllClients = new DataBroaCastSerlied(MOVE_END, mRoomIp, mDice, 0, 0, 0, 0, 0);
                     MsgNet msgToSend = new MsgNet(gameDataToAllClients.getGameData(), (byte) 0x00);
                     mServerInTele.sendToAll(msgToSend);
                     isFinish = true;
@@ -238,8 +234,8 @@ public class AtyGameSever extends AppCompatActivity {
 
 
                     //向所有客户端发送位置移动消息，向下一位使用的客户端发送移动位置的消息提醒----------------------------------------------------------------------
-                    mCurrent = (mCurrent + 1) % 4;
-                    DataBroaCastSerlied gameDataToAllClients = new DataBroaCastSerlied(MOVE_PLANE, mRoomIp, mDice, mIdBtnClicked, 0, indexPlaneEnd, mCurrent);
+                    int mNextRole = (mCurrent + 1) % 4;
+                    DataBroaCastSerlied gameDataToAllClients = new DataBroaCastSerlied(MOVE_PLANE, mRoomIp, mDice, mIdBtnClicked, 0, indexPlaneEnd, mCurrent, mNextRole);
                     MsgNet msgToSend = new MsgNet(gameDataToAllClients.getGameData(), (byte) 0x00);
                     mServerInTele.sendToAll(msgToSend);
 
@@ -277,19 +273,22 @@ public class AtyGameSever extends AppCompatActivity {
                     String tagFromClient = gameDataGetFromClient.getTag();
                     if (mRoomIp.equals(gameDataGetFromClient.getRoomIP())) {
                         if (tagFromClient.equals(MOVE_NO)) { //客户端发来没有投出启动色子的消息
-                            mCurrent = (mCurrent + 1) % 4;
-                            gameDataToAllClients = new DataBroaCastSerlied(MOVE_NO, mRoomIp, mDice, 0, 0, 0, mCurrent);
+                            int mNextRole = (mCurrent + 1) % 4;
+                            gameDataToAllClients = new DataBroaCastSerlied(MOVE_NO, mRoomIp, mDice, 0, 0, 0, mCurrent, mNextRole);
+                            mCurrent = mNextRole;
                             message.what = WHAT_MOVE_NO;
                         } else if (tagFromClient.equals(MOVE_PLANE)) {//正常的移动飞机的消息
-                            mCurrent = (mCurrent + 1) % 4;
+                            int mNextRole = (mCurrent + 1) % 4;
                             mIdBtnClicked = gameDataGetFromClient.getIdPlane();
                             mStart = gameDataGetFromClient.getStartIndex();
                             mEnd = gameDataGetFromClient.getEndIndex();
                             //向所有的客户端广播
-                            gameDataToAllClients = new DataBroaCastSerlied(MOVE_PLANE, mRoomIp, mDice, mIdBtnClicked, mStart, mEnd, mCurrent);
+                            gameDataToAllClients = new DataBroaCastSerlied(MOVE_PLANE, mRoomIp, mDice, mIdBtnClicked, mStart, mEnd, mCurrent, mNextRole);
                             message.what = WHAT_MOVE_PLAEN;
+                            mCurrent = mNextRole;
+
                         } else if (tagFromClient.equals(MOVE_END)) {
-                            gameDataToAllClients = new DataBroaCastSerlied(MOVE_END, mRoomIp, mDice, 0, 0, 0, 0);
+                            gameDataToAllClients = new DataBroaCastSerlied(MOVE_END, mRoomIp, mDice, 0, 0, 0, 0, 0);
                             message.what = WHAT_MOVE_END;
                         }
                         mHandler.sendMessage(message);

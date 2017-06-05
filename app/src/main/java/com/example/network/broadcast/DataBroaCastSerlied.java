@@ -19,6 +19,16 @@ public class DataBroaCastSerlied implements Serializable {
     private int mDice;
     private int mNextRole;
 
+    public int getCurrentRole() {
+        return mCurrentRole;
+    }
+
+    public void setCurrentRole(int currentRole) {
+        mCurrentRole = currentRole;
+    }
+
+    private int mCurrentRole;
+
     public int getNextRole() {
         return mNextRole;
     }
@@ -117,6 +127,7 @@ public class DataBroaCastSerlied implements Serializable {
         setPlayersNum(playersNum);
     }
 
+
     public DataBroaCastSerlied(String tag, String roomIP, String playerIP, String planeColor, String playerName) {
         setTag(tag);
         setRoomIP(roomIP);
@@ -141,8 +152,9 @@ public class DataBroaCastSerlied implements Serializable {
      * @param start   飞机移动的起始位置
      * @param end     飞机移动的结束位置
      */
-    public DataBroaCastSerlied(String tag, String roomIp, int dice, int planeId, int start, int end, int nextRole) {
+    public DataBroaCastSerlied(String tag, String roomIp, int dice, int planeId, int start, int end, int currentRole, int nextRole) {
         setTag(tag);
+        setCurrentRole(currentRole);
         setNextRole(nextRole);
         setDice(dice);
         setRoomIP(roomIp);
@@ -156,7 +168,7 @@ public class DataBroaCastSerlied implements Serializable {
         StringBuffer sb = new StringBuffer();
         sb.append(
                 tag + "," + roomIP + "," + mDice + ","
-                        + mIdPlane + "," + mStartIndex + "," + mEndIndex);
+                        + mIdPlane + "," + mStartIndex + "," + mEndIndex + "," + mCurrentRole + "," + mNextRole);
         return sb.toString();
     }
 

@@ -93,7 +93,6 @@ public class AtyClientSetting extends AppCompatActivity {
 
             if (msg.what == BEGIN_WHAT) {
                 Toast.makeText(AtyClientSetting.this, "Receive begin.", Toast.LENGTH_LONG).show();
-//                btnEnter.setClickable(true);
 
 
                 //客户端进入游戏房间----------------------------------------------------------------------------------------
@@ -133,6 +132,7 @@ public class AtyClientSetting extends AppCompatActivity {
         clientThread.start();
 
         btnEnter = (Button) findViewById(R.id.btnEnter);
+
         btnEnter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,6 +150,7 @@ public class AtyClientSetting extends AppCompatActivity {
                     RadioButton r = (RadioButton) radioGroupColor.getChildAt(radi);
                     if (r.isChecked()) {
                         planeColor = String.valueOf(radi);
+                        mIndex = radi;
                         break;
                     }
                 }
@@ -195,8 +196,8 @@ public class AtyClientSetting extends AppCompatActivity {
 //                ------------------------------------------------------------------------------------------------------
 
 
-                client = new Client(InetAddress.getByName(roomIP), SOCKET_PORT);
-//                client = Client.newInstance(InetAddress.getByName(roomIP), SOCKET_PORT);
+//                client = new Client(InetAddress.getByName(roomIP), SOCKET_PORT);
+                client = Client.newInstance(InetAddress.getByName(roomIP), SOCKET_PORT);
                 //                ------------------------------------------------------------------------------------------------------
 
             } catch (IOException e) {
@@ -217,7 +218,7 @@ public class AtyClientSetting extends AppCompatActivity {
                     if (enterMessage.getRoomIP().startsWith(roomIP)) {
                         if (enterMessage.getTag().startsWith(CONNECT)) {
                             Log.d(TAG, "客户端接受到了服务器的连接成功消息" + msg.toString());
-                            mIndex = Integer.parseInt(enterMessage.getPlayersNum());//get index at server
+//                            mIndex = Integer.parseInt(enterMessage.getPlayersNum());//get index at server
                             message.what = CONNECT_WHAT;
                             handler.sendMessage(message);
                         }

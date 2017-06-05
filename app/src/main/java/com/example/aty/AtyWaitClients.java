@@ -29,28 +29,39 @@ import java.util.TreeMap;
 public class AtyWaitClients extends AppCompatActivity {
     public static final String TAG = "test";
 
-    public static final String CREATE_ROOM = "CR";//CREATEROOM
-    public static final String CONNECT = "CO";//CONNECT TO SERVER
-    public static final String ENTER_ROOM = "EN";//ENTERROOM
-    public static final String WELCOME = "WE";//WELCOME
-    public static final String REFUSE = "RE";//REFUSE
-    public static final String BEGIN = "BE";//BEGIN
+    public static final String CREATE_ROOM = "create_room";//CREATEROOM
+    public static final String CONNECT = "connect_to_sever";//CONNECT TO SERVER
+    public static final String ENTER_ROOM = "enter_room";//ENTERROOM
+    public static final String WELCOME = "welecome";//WELCOME
+    public static final String REFUSE = "refuse";//REFUSE
+    public static final String BEGIN = "begin";//BEGIN
     public static final String CBACK = "CBA";//CBA
     public static final String RBACK = "RBA";//RBA
-    public static final int OUTPORT_MUL = 31111;
+    public static final int MULOUT_PORT = 31111;
     public static final int BEGIN_WHAT = 0x100;
     public static final int TO_HOME = 0x600;
     public static final int SOCKET_PORT = 20000;
 
+    //服务器实例
     ServerInTele serverInTel = null;
+    //组播帮助类，作用是加入组播或者加入组播后发送多播消息
     HelperBroascastGroup broascastGroupHelper = null;
+    //服务器发送多播消息的线程
     ThreadBroacastLuncher broacastRooMIPThread = null;
+
+    //服务器接收消息的线程，主要是tcp消息
     ServerAcceptThread serverAcceptThread = null;
+
+
     Button btnBegin = null;//click to start the game if all players hava entered.
     String roomIP = null;
     int playersNum;//the num of player
-    Map playersWait = new TreeMap();//color and ip which players have selected and entered.
-    Map waitsName = new TreeMap();//key = playerIp,value = planeColor
+
+    //房主维护所有加入房间的客户的信息，包括该用户选择的颜色和IP
+    Map mRoleIpAndColor = new TreeMap();//color and ip which players have selected and entered.
+
+    //所有人的名字
+    Map mRoleIpAndName = new TreeMap();//key = playerIp,value = planeColor
 
     Handler handler = new Handler() {
         @Override
@@ -77,17 +88,23 @@ public class AtyWaitClients extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wait_clients);
-//获取上一个aty传过来的数据
+
+        //获取房间IP
+        roomIP = HelperIPAdress.getIPByWifi(this);
+
+
+        //获取上一个aty传过来的数据
         Intent intent = getIntent();
 
         final Bundle bundle = intent.getExtras();
+        //上个活动传过来的游戏人数
         playersNum = Integer.parseInt(bundle.getString("playersNum"));
-        roomIP = HelperIPAdress.getIPByWifi(this);
 
         //add room creater plane color to colorList.key = playerIP,value = color.
 
-        playersWait.put(roomIP, bundle.getCharSequence("planeColor"));
-        waitsName.put(roomIP, bundle.getString("playerName"));
+        //将服务器对应的role的名字和颜色与服务器ip其实也就是房间ip对应起来
+        mRoleIpAndColor.put(roomIP, bundle.getCharSequence("planeColor"));
+        mRoleIpAndName.put(roomIP, bundle.getString("playerName"));
 
         btnBegin = (Button) findViewById(R.id.btnBegin);
         TextView txtRoomPlayerNum = (TextView) findViewById(R.id.txtRoomPlayerNum);
@@ -97,13 +114,12 @@ public class AtyWaitClients extends AppCompatActivity {
                 + "Host Color:" + bundle.getString("planeColor") + "\n" + "ip" + roomIP);
 
 
-        //新建组播地址
-        broascastGroupHelper = new HelperBroascastGroup(OUTPORT_MUL);
+        //多播消息的发送端口，创建多播需要一个输出端口可一个D类地址，D类地址被隐藏封装了，创建多播后要将自己加入多播组
+        broascastGroupHelper = new HelperBroascastGroup(MULOUT_PORT);
         broascastGroupHelper.joinGroup();
         broascastGroupHelper.setLoopback(true);
 
-//        发送广播，发送的内容是本房间的创建参数
-        //broadcast the ip of the creater of room
+//        发送广播，发送的内容是本房间的创建参数，要更改实时的信息就在这里，为什么要发送这么多无用信息
         DataBroaCastSerlied roomIPData = new DataBroaCastSerlied(CREATE_ROOM, roomIP, bundle.getString("playersNum"), roomIP, bundle.getString("planeColor"), bundle.getString("playerName"));
         broacastRooMIPThread = new ThreadBroacastLuncher(broascastGroupHelper, roomIPData.toString());
         broacastRooMIPThread.start();
@@ -190,13 +206,13 @@ public class AtyWaitClients extends AppCompatActivity {
                              */
                             if (enterData.getTag().startsWith(ENTER_ROOM)) {
                                 //判断房间内是否已经存在该客户端IP
-                                if (!playersWait.containsKey(enterData.getPlayerIP())) {
+                                if (!mRoleIpAndColor.containsKey(enterData.getPlayerIP())) {
                                     //判断房间内是不是已经存在被选过的飞机颜色
-                                    if (!playersWait.containsValue(enterData.getPlaneColor())) {
+                                    if (!mRoleIpAndColor.containsValue(enterData.getPlaneColor())) {
 
                                         //将该客户端加入房间
-                                        playersWait.put(enterData.getPlayerIP(), enterData.getPlaneColor());
-                                        waitsName.put(enterData.getPlayerIP(), enterData.getPlayerName());
+                                        mRoleIpAndColor.put(enterData.getPlayerIP(), enterData.getPlaneColor());
+                                        mRoleIpAndName.put(enterData.getPlayerIP(), enterData.getPlayerName());
 
                                         //发送全局广播欢迎
                                         dataToAllClients = new DataBroaCastSerlied(WELCOME, roomIP, String.valueOf(playersNum), enterData.getPlayerIP(), enterData.getPlaneColor(), enterData.getPlayerName());
@@ -214,29 +230,29 @@ public class AtyWaitClients extends AppCompatActivity {
                              */
                             if (enterData.getTag().startsWith(CBACK)) {
 
-                                if (playersWait.containsKey(enterData.getPlayerIP())) {
-                                    playersWait.remove(enterData.getPlayerIP());
+                                if (mRoleIpAndColor.containsKey(enterData.getPlayerIP())) {
+                                    mRoleIpAndColor.remove(enterData.getPlayerIP());
                                 }
-                                if (waitsName.containsKey(enterData.getPlayerIP())) {
-                                    waitsName.remove(enterData.getPlayerIP());
+                                if (mRoleIpAndName.containsKey(enterData.getPlayerIP())) {
+                                    mRoleIpAndName.remove(enterData.getPlayerIP());
                                 }
                                 int backIndex = Integer.valueOf(enterData.getPlayersNum());
                                 serverInTel.close(backIndex);
                                 playersNum--;
                             }
                             /**
-                             * 假如玩家已经够了就要开始游戏了
+                             * 假如玩家已经够了就要开始游戏了,将所有role的所有信息全部打包发送
                              */
-                            if (playersWait.size() == playersNum && playersNum != 1) {
+                            if (mRoleIpAndColor.size() == playersNum && playersNum != 1) {
                                 String playersName = new String();
                                 String playersIP = new String();
                                 String playersColor = new String();
-                                Iterator itr = playersWait.entrySet().iterator();
+                                Iterator itr = mRoleIpAndColor.entrySet().iterator();
                                 while (itr.hasNext()) {
                                     Map.Entry entry = (Map.Entry) itr.next();
                                     playersIP += entry.getKey() + "#";
                                     playersColor += entry.getValue() + "#";
-                                    playersName += waitsName.get(entry.getKey()) + "#";
+                                    playersName += mRoleIpAndName.get(entry.getKey()) + "#";
                                 }
                                 dataToAllClients = new DataBroaCastSerlied(BEGIN, roomIP, String.valueOf(playersNum), playersIP, playersColor, playersName);
                                 msgToSend = new MsgNet(dataToAllClients.toString(), (byte) 0x00);
@@ -280,7 +296,7 @@ public class AtyWaitClients extends AppCompatActivity {
             @Override
             public void run() {
 
-                HelperBroascastGroup rBackBroascast = new HelperBroascastGroup(OUTPORT_MUL);
+                HelperBroascastGroup rBackBroascast = new HelperBroascastGroup(MULOUT_PORT);
                 rBackBroascast.joinGroup();
                 rBackBroascast.setLoopback(true);
 

@@ -30,14 +30,36 @@ public class Client implements Serializable {
     private PrintWriter out = null;
     QueueMsg msg = new QueueMsg();
 
-    /**
-     * 初始化Client并新建一个线程监听服务器发送来的数据
-     *
-     * @param inet 服务器地址
-     * @param p    服务器端口
-     * @throws IOException
-     */
-    public Client(InetAddress inet, int p) throws IOException {
+//    /**
+//     * 初始化Client并新建一个线程监听服务器发送来的数据
+//     *
+//     * @param inet 服务器地址
+//     * @param p    服务器端口
+//     * @throws IOException
+//     */
+//    public Client(InetAddress inet, int p) throws IOException {
+//        this.addr = inet;
+//        this.port = p;
+//        this.socket = new Socket(this.addr, this.port);
+//        try {
+//            init();
+//        } catch (IOException e) {
+//            //打开输入输出流失败
+//            mThreadClientRead = null;
+//            this.out = null;
+//            e.printStackTrace();
+//        }
+//    }
+
+
+//    -----------------------------------------------------------------------------------------------------------------------
+
+    private static Client sClient;
+
+    private Client(InetAddress inet, int p) throws IOException {
+
+
+        Log.e("test", "CLient的构造方法");
         this.addr = inet;
         this.port = p;
         this.socket = new Socket(this.addr, this.port);
@@ -51,34 +73,12 @@ public class Client implements Serializable {
         }
     }
 
-
-//    -----------------------------------------------------------------------------------------------------------------------
-
-    private static Client sClient;
-
-//    private Client(InetAddress inet, int p) throws IOException {
-//
-//
-//        Log.e("test", "CLient的构造方法");
-//        this.addr = inet;
-//        this.port = p;
-//        this.socket = new Socket(this.addr, this.port);
-//        try {
-//            init();
-//        } catch (IOException e) {
-//            //打开输入输出流失败
-//            mThreadClientRead = null;
-//            this.out = null;
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public static Client newInstance(InetAddress inetAddress, int port) throws IOException {
-//        if (sClient == null) {
-//            sClient = new Client(inetAddress, port);
-//        }
-//        return sClient;
-//    }
+    public static Client newInstance(InetAddress inetAddress, int port) throws IOException {
+        if (sClient == null) {
+            sClient = new Client(inetAddress, port);
+        }
+        return sClient;
+    }
 
 
     //    -----------------------------------------------------------------------------------------------------------------------

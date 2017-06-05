@@ -48,7 +48,7 @@ public class AtySearchRoom extends AppCompatActivity {
     Handler handler = null;
     DataBroaCastSerlied roomData = null;
     List<Map<String, Object>> roomList = new ArrayList<Map<String, Object>>();
-    List<String> temp = new ArrayList<String>();
+    List<String> temp = new ArrayList<>();
     SimpleAdapter roominfo;
     ListView mRooms = null;
 
