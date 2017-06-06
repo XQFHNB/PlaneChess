@@ -14,7 +14,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
-        <activity android:name="com.example.aty.AtyMain">
+        <activity android:name="com.example.aty1.AtyStartWifiGame">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -28,6 +28,13 @@
         <activity android:name="com.example.aty.AtyClientSetting"></activity>
         <activity android:name="com.example.aty.AtyGameClient"></activity>
         <activity android:name="com.example.aty.AtyGameSever"></activity>
+
+        <activity android:name="com.example.aty1.AtySelectGame"></activity>
+        <activity android:name="com.example.aty1.AtyRule"></activity>
+        <activity android:name="com.example.aty1.AtyStartClassicGame"></activity>
+        <activity android:name="com.example.aty1.AtyCreateRoom"></activity>
+        <activity android:name="com.example.aty1.AtyWaitClients"></activity>
+        <activity android:name="com.example.aty1.AtyClientSetting"></activity>
     </application>
 
 </manifest>

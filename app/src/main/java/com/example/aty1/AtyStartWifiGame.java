@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.aty.AtyClientSetting;
 import com.example.bean.BeanRoomInfo;
 import com.example.network.broadcast.DataBroaCastSerlied;
 import com.example.network.broadcast.HelperBroadCastBase;
@@ -45,15 +44,16 @@ public class AtyStartWifiGame extends AppCompatActivity {
     public static final String TAG = "test";
 
     public static final String SEARCH_ROOM = "SE";//SEARCHROOM
-    public static final String CREATE_ROOM = "CR";//CREATEROOM
-    public static final String WELCOME = "WE";//WELCOME
-    public static final String REFUSE = "RE";//REFUSE
-    public static final String BEGIN = "BE";//BEGIN
+    public static final String CREATE_ROOM = "create_room";//CREATEROOM
+    public static final String WELCOME = "welcome";//WELCOME
+    public static final String REFUSE = "refuse";//REFUSE
+    public static final String BEGIN = "begin";//BEGIN
     public static final String RBACK = "RBA";//RBA
     public static final int RBACK_WHAT = 0x100;
     public static final int INPORT_MUL = 31111;
     public static final int GET_ROOM_IP = 0x200;
     public static final String ROOM_DATA = "roomData";
+
 
     HelperBroascastGroup broascastGroupHelper = null;
     SearchRoomThread searchRoomThread = null;
@@ -77,9 +77,10 @@ public class AtyStartWifiGame extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.aty_start_wiifi_game);
+        ButterKnife.bind(this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mMyAdapter = new MyAdapter(this);
-
+        mBeanRoomInfos = new ArrayList<>();
         mRecyclerView.setAdapter(mMyAdapter);
 
         //刷新列表
@@ -105,6 +106,7 @@ public class AtyStartWifiGame extends AppCompatActivity {
                 UtilDeserializable deserializable = new UtilDeserializable();
                 roomData = deserializable.deSerliBroacastData(msg.msg);
                 //receive Room IP，收到一个房间号的广播,于是要增加列表项目
+                String tag = roomData.getTag();
                 if (roomData.getTag().startsWith(CREATE_ROOM)) {
                     if (!mTempRoomsIp.contains(roomData.getRoomIP())) {
                         mTempRoomsIp.add(roomData.getRoomIP());
@@ -113,9 +115,10 @@ public class AtyStartWifiGame extends AppCompatActivity {
                         beanRoomInfo.setIp(roomData.getPlayerIP());
                         beanRoomInfo.setRoomeName(roomData.getPlayerName());
                         beanRoomInfo.setRoomData(roomData);
-
+                        beanRoomInfo.setPlayersSum(roomData.getPlayersNum());
 
 //                        mMyAdapter.addItems(beanRoomInfo);
+                        String result = beanRoomInfo.toString();
                         mBeanRoomInfos.add(beanRoomInfo);
                         Message message = handler.obtainMessage();
                         message.what = GET_ROOM_IP;
@@ -171,6 +174,7 @@ public class AtyStartWifiGame extends AppCompatActivity {
         public void bind(BeanRoomInfo beanRoomInfo) {
             mTextViewName.setText(beanRoomInfo.getRoomeName());
             room = beanRoomInfo.getRoomData();
+            mTextViewNum.setText(beanRoomInfo.getPlayersSum());
 //            mTextViewNum.setText(beanRoomInfo.get);
         }
 
@@ -188,12 +192,12 @@ public class AtyStartWifiGame extends AppCompatActivity {
 
     class MyAdapter extends RecyclerView.Adapter<MyHolder> {
 
-        List<BeanRoomInfo> mBeanRoomInfos;
+        List<BeanRoomInfo> mBeanRoomInfosList;
         Context mContext;
 
         public MyAdapter(Context context) {
             mContext = context;
-            mBeanRoomInfos = new ArrayList<>();
+            mBeanRoomInfosList = new ArrayList<>();
         }
 
         @Override
@@ -204,20 +208,22 @@ public class AtyStartWifiGame extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(MyHolder holder, int position) {
-            BeanRoomInfo beanRoomInfo = mBeanRoomInfos.get(position);
+            BeanRoomInfo beanRoomInfo = mBeanRoomInfosList.get(position);
             holder.bind(beanRoomInfo);
         }
 
         @Override
         public int getItemCount() {
-            return mBeanRoomInfos.size();
+            return mBeanRoomInfosList.size();
         }
 
         public void addItems(List<BeanRoomInfo> list) {
-            if (mBeanRoomInfos.size() != 0) {
-                mBeanRoomInfos.clear();
+            if (mBeanRoomInfosList.size() != 0) {
+                mBeanRoomInfosList.clear();
+                mBeanRoomInfosList.addAll(list);
+            } else {
+                mBeanRoomInfosList.addAll(list);
             }
-            mBeanRoomInfos = list;
         }
 
     }
@@ -247,7 +253,7 @@ public class AtyStartWifiGame extends AppCompatActivity {
 
     @OnClick(R.id.btn_createroom)
     public void onBtnCreateRoomClick() {
-
+        AtyCreateRoom.startAtyCreateRoom(this, AtyCreateRoom.class);
     }
 }
 

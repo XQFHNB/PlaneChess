@@ -10,6 +10,15 @@ public class BeanRoomInfo {
     private String mRoomeName;
     private String mIp;
     private DataBroaCastSerlied mRoomData;
+    private String mPlayersSum;
+
+    public String getPlayersSum() {
+        return mPlayersSum;
+    }
+
+    public void setPlayersSum(String playersSum) {
+        mPlayersSum = playersSum;
+    }
 
     public String getRoomeName() {
         return mRoomeName;
@@ -32,6 +41,15 @@ public class BeanRoomInfo {
     }
 
     public void setRoomData(DataBroaCastSerlied roomData) {
+
+
         mRoomData = roomData;
+    }
+
+    @Override
+    public String toString() {
+        return "房间名：" + mRoomeName + " ip:" + mIp;
+
+
     }
 }

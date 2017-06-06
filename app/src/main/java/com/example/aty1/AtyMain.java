@@ -35,7 +35,7 @@ public class AtyMain extends AppCompatActivity {
 
     @OnClick(R.id.btn_aty_main_play)
     public void onBtnPlayClick() {
-
+        AtySelectGame.startAtySelectGame(this, AtySelectGame.class);
     }
 
     @OnClick(R.id.btn_aty_main_rule)
@@ -45,7 +45,7 @@ public class AtyMain extends AppCompatActivity {
 
     @OnClick(R.id.btn_aty_main_back)
     public void onBtnBackClick() {
-        AtySelectGame.startAtySelectGame(this, AtySelectGame.class);
+
     }
 
 

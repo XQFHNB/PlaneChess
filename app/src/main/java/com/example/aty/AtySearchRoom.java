@@ -30,10 +30,10 @@ public class AtySearchRoom extends AppCompatActivity {
     public static final String TAG = "test";
 
     public static final String SEARCH_ROOM = "SE";//SEARCHROOM
-    public static final String CREATE_ROOM = "CR";//CREATEROOM
-    public static final String WELCOME = "WE";//WELCOME
-    public static final String REFUSE = "RE";//REFUSE
-    public static final String BEGIN = "BE";//BEGIN
+    public static final String CREATE_ROOM = "create_room";//CREATEROOM
+    public static final String WELCOME = "welcome";//WELCOME
+    public static final String REFUSE = "refuse";//REFUSE
+    public static final String BEGIN = "begin";//BEGIN
     public static final String RBACK = "RBA";//RBA
     public static final int RBACK_WHAT = 0x100;
     public static final int INPORT_MUL = 31111;
@@ -94,6 +94,7 @@ public class AtySearchRoom extends AppCompatActivity {
             public void onReceive(HelperBroadCastBase.BroadCastBaseMsg msg) {
                 UtilDeserializable deserializable = new UtilDeserializable();
                 roomData = (DataBroaCastSerlied) deserializable.deSerliBroacastData(msg.msg);
+                String tag = roomData.getTag();
                 //receive Room IP，收到一个房间号的广播
                 if (roomData.getTag().startsWith(CREATE_ROOM)) {
                     if (!temp.contains(roomData.getRoomIP())) {

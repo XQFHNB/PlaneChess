@@ -4,34 +4,36 @@ package com.example.network.broadcast;
  * Created by Huangbin on 2016/4/19.
  */
 public class ThreadBroacastLuncher extends Thread {
-    private  volatile boolean stopThread=true;
+    private volatile boolean stopThread = true;
     private HelperBroascastGroup mBroacastGrouperHelper;
     //private   Context mCoontext;
-    private   String data;
-    private Object mLock=new Object();
+    private String data;
+    private Object mLock = new Object();
     private int waitTime;
+
     /**
      * @param helper BroascastGroupHelper第一个发起者
-     * @param ip     ip一定不能为空
+     * @param     ip一定不能为空
      */
     public ThreadBroacastLuncher(HelperBroascastGroup helper, String data) {
-       this.mBroacastGrouperHelper=helper;
-        this.data=data;
+        this.mBroacastGrouperHelper = helper;
+        this.data = data;
         waitTime = 100;
     }
 
     public ThreadBroacastLuncher(HelperBroascastGroup helper, String data, int waitTime) {
-        this.mBroacastGrouperHelper=helper;
-        this.data=data;
+        this.mBroacastGrouperHelper = helper;
+        this.data = data;
         this.waitTime = waitTime;
     }
 
-    public  void stopThread(){
+    public void stopThread() {
         synchronized (mLock) {
             this.stopThread = false;
             mBroacastGrouperHelper.destory();
         }
     }
+
     @Override
     public void run() {
         synchronized (mLock) {
@@ -44,5 +46,9 @@ public class ThreadBroacastLuncher extends Thread {
                 }
             }
         }
+    }
+
+    public void setData(String str) {
+        this.data = str;
     }
 }

@@ -92,16 +92,16 @@
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:layout_centerInParent="true"
-                            android:background="@drawable/bg_select_circle"
-                            android:visibility="invisible"/>
+                            android:background="@null"
+                            />
 
                         <Button
                             android:id="@+id/btn_num_4"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:layout_alignParentRight="true"
-                            android:background="@drawable/bg_select_circle"
-                            android:visibility="invisible"/>
+                            android:background="@null"
+                            />
                     </RelativeLayout>
 
 

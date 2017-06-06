@@ -1,5 +1,7 @@
 package com.example.aty1;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -24,7 +26,10 @@ import butterknife.OnClick;
 public class AtyCreateRoom extends AppCompatActivity {
 
 
-
+    public static void startAtyCreateRoom(Context context, Class<?> cls) {
+        Intent intent = new Intent(context, cls);
+        context.startActivity(intent);
+    }
 
     @BindView(R.id.btn_createroom)
     protected Button btnCreateRoom;
@@ -42,7 +47,6 @@ public class AtyCreateRoom extends AppCompatActivity {
     protected Button mButton3;
     @BindView(R.id.btn_num_4)
     protected Button mButton4;
-
 
 
     private boolean mIsBtn2Visible = true;
@@ -100,9 +104,10 @@ public class AtyCreateRoom extends AppCompatActivity {
         mIsBtn2Visible = true;
         mIsBtn3Visible = false;
         mIsBtn4Visible = false;
-        mButton2.setVisibility(View.VISIBLE);
-        mButton3.setVisibility(View.INVISIBLE);
-        mButton4.setVisibility(View.INVISIBLE);
+        mButton2.setBackground(getResources().getDrawable(R.drawable.bg_select_circle));
+        mButton3.setBackground(null);
+        mButton4.setBackground(null);
+
     }
 
     @OnClick(R.id.btn_num_3)
@@ -110,9 +115,10 @@ public class AtyCreateRoom extends AppCompatActivity {
         mIsBtn2Visible = false;
         mIsBtn3Visible = true;
         mIsBtn4Visible = false;
-        mButton2.setVisibility(View.INVISIBLE);
-        mButton3.setVisibility(View.VISIBLE);
-        mButton4.setVisibility(View.INVISIBLE);
+        mButton2.setBackground(null);
+        mButton3.setBackground(getResources().getDrawable(R.drawable.bg_select_circle));
+        mButton4.setBackground(null);
+
     }
 
     @OnClick(R.id.btn_num_4)
@@ -120,12 +126,10 @@ public class AtyCreateRoom extends AppCompatActivity {
         mIsBtn2Visible = false;
         mIsBtn3Visible = false;
         mIsBtn4Visible = true;
-        mButton2.setVisibility(View.INVISIBLE);
-        mButton3.setVisibility(View.INVISIBLE);
-        mButton4.setVisibility(View.VISIBLE);
+        mButton2.setBackground(null);
+        mButton3.setBackground(null);
+        mButton4.setBackground(getResources().getDrawable(R.drawable.bg_select_circle));
     }
-
-
 
 
     public void toast(String str) {
