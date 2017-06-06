@@ -46,7 +46,7 @@ public class AtySelectGame extends AppCompatActivity {
 
     @OnClick(R.id.btn_aty_select_back)
     public void onBtnBackClick() {
-
+        finish();
     }
 
     @OnClick(R.id.btn_aty_select_classic)

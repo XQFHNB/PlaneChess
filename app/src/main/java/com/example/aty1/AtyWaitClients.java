@@ -13,8 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.aty.*;
-import com.example.aty.AtyMain;
 import com.example.network.broadcast.DataBroaCastSerlied;
 import com.example.network.broadcast.HelperBroascastGroup;
 import com.example.network.broadcast.HelperIPAdress;
@@ -31,6 +29,7 @@ import java.util.TreeMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * @author XQF
@@ -47,6 +46,7 @@ public class AtyWaitClients extends AppCompatActivity {
         intent.putExtra("rolecolor", roleColor);
         context.startActivity(intent);
     }
+
     public static final String TAG = "test";
 
     public static final String CREATE_ROOM = "create_room";//CREATEROOM
@@ -90,22 +90,22 @@ public class AtyWaitClients extends AppCompatActivity {
 
 
     private int mCounterNum = 1;
+
+    @BindView(R.id.btn_aty_wait_clients)
+    protected Button mButtonBack;
+
     @BindView(R.id.player1)
     protected LinearLayout mLinearLayoutPlayer1;
     @BindView(R.id.player2)
-
     protected LinearLayout mLinearLayoutPlayer2;
     @BindView(R.id.player3)
-
     protected LinearLayout mLinearLayoutPlayer3;
     @BindView(R.id.player4)
-
     protected LinearLayout mLinearLayoutPlayer4;
 
     private int[] mPlayerColors = new int[]{R.color.blue, R.color.red, R.color.yellow, R.color.green};
 
-    private LinearLayout[] mLinearLayouts = new LinearLayout[]{mLinearLayoutPlayer1, mLinearLayoutPlayer2, mLinearLayoutPlayer3, mLinearLayoutPlayer4};
-
+    private LinearLayout[] mLinearLayouts;
 
     Handler handler = new Handler() {
         @Override
@@ -116,11 +116,8 @@ public class AtyWaitClients extends AppCompatActivity {
                 Toast.makeText(AtyWaitClients.this, "Click to begin...", Toast.LENGTH_LONG).show();
 
             }
-
             if (msg.what == UPDATE_UI) {
-
-
-                mLinearLayouts[mCounterNum - 1].setBackgroundColor(msg.arg1);
+                mLinearLayouts[mCounterNum - 1].setBackgroundColor(mPlayerColors[msg.arg1]);
             }
 
             if (msg.what == TO_HOME) {
@@ -140,6 +137,8 @@ public class AtyWaitClients extends AppCompatActivity {
         ButterKnife.bind(this);
         TextView txtRoomPlayerNum = (TextView) findViewById(R.id.txtRoomPlayerNum);
         btnBegin = (Button) findViewById(R.id.btnBegin);
+        mLinearLayouts = new LinearLayout[]{mLinearLayoutPlayer1, mLinearLayoutPlayer2, mLinearLayoutPlayer3, mLinearLayoutPlayer4};
+
 
         //获取房间IP
         roomIP = HelperIPAdress.getIPByWifi(this);
@@ -148,7 +147,7 @@ public class AtyWaitClients extends AppCompatActivity {
         //获取上一个aty传过来的数据
         Intent intent = getIntent();
 
-        final Bundle bundle = intent.getExtras();
+        Bundle bundle = intent.getExtras();
         //上个活动传过来的游戏人数
         playersNum = Integer.parseInt(bundle.getString("playersum"));
 
@@ -157,15 +156,15 @@ public class AtyWaitClients extends AppCompatActivity {
         //将服务器对应的role的名字和颜色与服务器ip其实也就是房间ip对应起来
         mRoleIpAndColor.put(roomIP, bundle.getCharSequence("rolecolor"));
         mRoleIpAndName.put(roomIP, bundle.getString("roomname"));
+
         mRoomColor = bundle.getString("rolecolor");
         mRoomName = bundle.getString("roomname");
-
-//        mLinearLayoutPlayer1.setBackgroundColor(mPlayerColors[Integer.parseInt(mRoomColor)]);
         mLinearLayoutPlayer1.setBackgroundColor(mPlayerColors[0]);
 
-        txtRoomPlayerNum.setText("飞机起飞点数：" + bundle.getString("startNums") + "\n" + "人数：" +
-                bundle.getString("playersum") + "\n" + "Host Name:" + bundle.getString("roomname") + "\n"
-                + "Host Color:" + bundle.getString("rolecolor") + "\n" + "ip" + roomIP);
+//        txtRoomPlayerNum.setText("飞机起飞点数：" + bundle.getString("startNums") + "\n" + "人数：" +
+//                bundle.getString("playersum") + "\n" + "Host Name:" + bundle.getString("roomname") + "\n"
+//                + "Host Color:" + bundle.getString("rolecolor") + "\n" + "ip" + roomIP);
+        txtRoomPlayerNum.setText("房间IP:" + roomIP);
 
 
         //多播消息的发送端口，创建多播需要一个输出端口可一个D类地址，D类地址被隐藏封装了，创建多播后要将自己加入多播组
@@ -187,10 +186,7 @@ public class AtyWaitClients extends AppCompatActivity {
          */
         try {
 
-//            -------------------------------------------------------------------------------------------------------------------------
-//            serverInTel = new ServerInTele(playersNum, SOCKET_PORT);
             serverInTel = ServerInTele.newInstance(playersNum, SOCKET_PORT);
-            //            -------------------------------------------------------------------------------------------------------------------------
 
             serverInTel.accept();
         } catch (IOException e) {
@@ -222,7 +218,7 @@ public class AtyWaitClients extends AppCompatActivity {
                 dataToAllClients = new DataBroaCastSerlied(BEGIN, roomIP, String.valueOf(playersNum), playersIP, playersColor, playersName);
                 MsgNet msgToSend = new MsgNet(dataToAllClients.toString(), (byte) 0x00);
                 serverInTel.sendToAll(msgToSend);
-                AtyGameSever.startAtyGameSever(AtyWaitClients.this, AtyGameSever.class, serverInTel, roomIP);
+                AtyGameSever.startAtyGameSever(AtyWaitClients.this, AtyGameSever.class, mRoomColor, roomIP);
             }
         });
     }
@@ -240,7 +236,6 @@ public class AtyWaitClients extends AppCompatActivity {
             stopThread = true;
             this.interrupt();
             serverInTel.closeAll();
-
         }
 
         @Override
@@ -263,7 +258,7 @@ public class AtyWaitClients extends AppCompatActivity {
                         DataBroaCastSerlied dataToSingleClient = new DataBroaCastSerlied(CONNECT, roomIP, msg.getData(), "NULL", "NULL", "NULL");//playersNum == cIndex
                         MsgNet msgToSend = new MsgNet(dataToSingleClient.toString(), (byte) 0x60);
                         //发送房间信息
-                        Log.d(TAG, "向客户发送信息" + msg.toString());
+                        Log.d(TAG, "向指定客户发送信息" + msg.toString());
                         serverInTel.send(cIndex, msgToSend);
 
                     } else {//the data client select a plane
@@ -299,7 +294,7 @@ public class AtyWaitClients extends AppCompatActivity {
                                         message.what = UPDATE_UI;
                                         message.arg1 = Integer.parseInt(enterData.getPlaneColor());
                                         handler.sendMessage(message);
-
+                                        Log.d(TAG, "该更新UIle ");
 
                                         //发送全局广播欢迎
                                         dataToAllClients = new DataBroaCastSerlied(WELCOME, roomIP, String.valueOf(playersNum), enterData.getPlayerIP(), enterData.getPlaneColor(), enterData.getPlayerName());
@@ -325,13 +320,12 @@ public class AtyWaitClients extends AppCompatActivity {
                                 }
                                 int backIndex = Integer.valueOf(enterData.getPlayersNum());
                                 serverInTel.close(backIndex);
-                                playersNum--;
+//                                playersNum--;
                             }
                             /**
                              * 假如玩家已经够了就要开始游戏了,将所有role的所有信息全部打包发送
                              */
                             if (mRoleIpAndColor.size() == playersNum && playersNum != 1) {
-
                                 Message message = handler.obtainMessage();
                                 message.what = BEGIN_WHAT;
                                 handler.sendMessage(message);
@@ -393,6 +387,11 @@ public class AtyWaitClients extends AppCompatActivity {
         serverAcceptThread.setStopThread();
         Log.e("doits", "ondestroy server");
         super.onDestroy();
+    }
+
+    @OnClick(R.id.btn_aty_wait_clients)
+    public void obBtnClickBack() {
+        finish();
     }
 }
 

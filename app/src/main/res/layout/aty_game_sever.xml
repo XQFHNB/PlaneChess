@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@drawable/boardnoposition"
-              android:orientation="vertical">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/boardnoposition"
+                android:orientation="vertical">
 
     <Button
         android:id="@+id/btn_click"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerInParent="true"
         android:text="点击"/>
 
     <Button
@@ -138,4 +139,244 @@
         android:background="@drawable/plane_green"
         android:onClick="btnOnClick"
         />
-</LinearLayout>
+
+
+    <Button
+        android:id="@+id/btn_avatar_green"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:background="@color/green"/>
+
+    <Button
+        android:id="@+id/btn_roll_green"
+        android:layout_width="40dp"
+
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/btn_avatar_green"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_btn_roll_green"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/btn_avatar_green">
+
+        <ImageView
+            android:id="@+id/image_green_star_4"
+
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/bg_empty_star"
+
+            />
+
+        <ImageView
+            android:id="@+id/image_green_star_3"
+            android:layout_width="20dp"
+
+            android:layout_height="20dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/bg_empty_star"
+            />
+
+        <ImageView
+            android:id="@+id/image_green_star_2"
+            android:layout_width="20dp"
+
+            android:layout_height="20dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/bg_empty_star"
+            />
+
+        <ImageView
+            android:id="@+id/image_green_star_1"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/bg_empty_star"
+            />
+    </LinearLayout>
+
+    <!--blue-->
+
+    <Button
+        android:id="@+id/btn_avatar_blue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:background="@color/blue"/>
+
+    <Button
+        android:id="@+id/btn_roll_blue"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_above="@id/btn_avatar_blue"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_btn_roll_blue"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@id/btn_avatar_blue">
+
+        <ImageView
+            android:id="@+id/image_blue_star_4"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/bg_empty_star"
+
+            />
+
+        <ImageView
+            android:id="@+id/image_blue_star_3"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+
+            android:layout_margin="2dp"
+            android:src="@drawable/bg_empty_star"
+            />
+
+        <ImageView
+            android:id="@+id/image_blue_star_2"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+
+            android:layout_margin="2dp"
+            android:src="@drawable/bg_empty_star"
+            />
+
+        <ImageView
+            android:id="@+id/image_blue_star_1"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/bg_empty_star"
+            />
+    </LinearLayout>
+
+    <!--red-->
+
+
+    <Button
+        android:id="@+id/btn_avatar_red"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="@color/red"/>
+
+    <Button
+        android:id="@+id/btn_roll_red"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_above="@id/btn_avatar_blue"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_btn_roll_red"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@id/btn_avatar_red">
+
+        <ImageView
+            android:id="@+id/image_star_red_1"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/bg_empty_star"
+            />
+
+        <ImageView
+            android:id="@+id/image_star_red_2"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/bg_empty_star"
+            />
+
+        <ImageView
+            android:id="@+id/image_star_red_3"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="2dp"
+
+            android:src="@drawable/bg_empty_star"
+            />
+
+        <ImageView
+            android:id="@+id/image_star_red_4"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/bg_empty_star"
+            />
+    </LinearLayout>
+
+    <!--yellow-->
+    <Button
+        android:id="@+id/btn_avatar_yellow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:background="@color/yellow"/>
+
+    <Button
+        android:id="@+id/btn_roll_yellow"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/btn_avatar_yellow"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_btn_roll_yellow"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/btn_avatar_red">
+
+        <ImageView
+            android:id="@+id/image_yellow_star_1"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/bg_empty_star"
+
+            />
+
+        <ImageView
+            android:id="@+id/image_yellow_star_2"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/bg_empty_star"
+            />
+
+        <ImageView
+            android:id="@+id/image_yellow_star_3"
+
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/bg_empty_star"
+            />
+
+        <ImageView
+            android:id="@+id/image_yellow_star_4"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="2dp"
+            android:src="@drawable/bg_empty_star"
+            />
+    </LinearLayout>
+
+</RelativeLayout>

@@ -14,20 +14,17 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
-        <activity android:name="com.example.aty1.AtyStartWifiGame">
+        <activity
+            android:name="com.example.aty1.AtyMain"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.example.aty.AtyCreateRoom"/>
-        <activity android:name="com.example.aty.AtySearchRoom"/>
-        <activity android:name="com.example.aty.AtyInstruction"/>
-        <activity android:name="com.example.aty.AtyWaitClients"/>
-        <activity android:name="com.example.aty.AtyClientSetting"></activity>
-        <activity android:name="com.example.aty.AtyGameClient"></activity>
-        <activity android:name="com.example.aty.AtyGameSever"></activity>
+        <activity android:name="com.example.aty1.AtyGameClient"></activity>
+        <activity android:name="com.example.aty1.AtyGameSever"></activity>
 
         <activity android:name="com.example.aty1.AtySelectGame"></activity>
         <activity android:name="com.example.aty1.AtyRule"></activity>
@@ -35,6 +32,7 @@
         <activity android:name="com.example.aty1.AtyCreateRoom"></activity>
         <activity android:name="com.example.aty1.AtyWaitClients"></activity>
         <activity android:name="com.example.aty1.AtyClientSetting"></activity>
+        <activity android:name="com.example.aty1.AtyStartWifiGame"></activity>
     </application>
 
 </manifest>

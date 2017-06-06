@@ -2,92 +2,126 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="@drawable/bg"
+              android:background="@drawable/bg_main_empty"
               android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="15dp"
-        android:background="#eeffffff"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="房间：001"/>
-
-        <TextView
-            android:id="@+id/txtRoomPlayerNum"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="当前房间人数：4"
-            android:textColor="@color/blue"/>
-
+        android:background="@drawable/bg_mountain">
+        <Button
+            android:id="@+id/btn_aty_wait_clients"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/bg_btn_back"/>
         <LinearLayout
-            android:id="@+id/player1"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_margin="15dp"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:layout_marginLeft="70dp"
+            android:layout_marginRight="70dp"
+            android:background="@drawable/bg_rule"
+            android:orientation="vertical"
+            android:paddingLeft="70dp"
+            android:paddingRight="70dp"
+            >
 
             <TextView
-                android:layout_width="100px"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="玩家1"
-                android:textColor="@color/black"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/player2"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_margin="15dp"
-            android:orientation="vertical">
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="50dp"
+                android:text="房间：001"
+                android:textColor="@color/textcolor"/>
 
             <TextView
-                android:layout_width="100px"
+                android:id="@+id/txtRoomPlayerNum"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="玩家2"
-                android:textColor="@color/black"/>
-        </LinearLayout>
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="15dp"
+                android:text="当前房间人数：4"
+                android:textColor="@color/textcolor"/>
 
-        <LinearLayout
-            android:id="@+id/player3"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_margin="15dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="100px"
+            <LinearLayout
+                android:id="@+id/player1"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="玩家3"
-                android:textColor="@color/black"/>
-        </LinearLayout>
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/player4"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_margin="15dp"
-            android:orientation="vertical">
+                <TextView
+                    android:layout_width="100px"
+                    android:layout_height="wrap_content"
+                    android:text="玩家1"
+                    android:textColor="@color/black"/>
+            </LinearLayout>
 
-            <TextView
-                android:layout_width="100px"
+            <LinearLayout
+                android:id="@+id/player2"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="玩家4"
-                android:textColor="@color/black"/>
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="15dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="100px"
+                    android:layout_height="wrap_content"
+                    android:text="玩家2"
+                    android:textColor="@color/black"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/player3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+
+                android:layout_marginTop="15dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="100px"
+                    android:layout_height="wrap_content"
+                    android:text="玩家3"
+                    android:textColor="@color/black"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/player4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+
+                android:layout_marginTop="15dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="100px"
+                    android:layout_height="wrap_content"
+                    android:text="玩家4"
+                    android:textColor="@color/black"/>
+            </LinearLayout>
+
+
         </LinearLayout>
 
         <Button
             android:id="@+id/btnBegin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:background="@color/sky"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="50dp"
+            android:background="@drawable/bg_btn_start"
             android:enabled="false"
-            android:text="开始"/>
-    </LinearLayout>
+            />
+
+    </RelativeLayout>
+
+
 </LinearLayout>

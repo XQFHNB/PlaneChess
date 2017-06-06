@@ -45,7 +45,7 @@ public class AtyMain extends AppCompatActivity {
 
     @OnClick(R.id.btn_aty_main_back)
     public void onBtnBackClick() {
-
+        finish();
     }
 
 

@@ -8,16 +8,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.bean.BeanBoard;
 import com.example.bean.BeanCell;
 import com.example.bean.BeanPlane;
 import com.example.bean.BeanRole;
+import com.example.network.broadcast.DataBroaCastSerlied;
+import com.example.network.model.MsgNet;
 import com.example.yifeihappy.planechess.R;
 
 import java.util.HashMap;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * @author XQF
@@ -65,6 +73,70 @@ public class AtyGameClassic extends AppCompatActivity {
     private int[] mIDGreen = new int[]{R.id.btn_green_0, R.id.btn_green_1, R.id.btn_green_2, R.id.btn_green_3};
 
 
+    @BindView(R.id.btn_roll_blue)
+    Button mButtonRollBlue;
+    @BindView(R.id.btn_roll_red)
+    Button mButtonRollRed;
+    @BindView(R.id.btn_roll_yellow)
+    Button mButtonRollYellow;
+    @BindView(R.id.btn_roll_green)
+    Button mButtonRollGreen;
+    Button[] rollBtns = null;
+
+    @BindView(R.id.image_star_red_1)
+    ImageView mImageViewRed1;
+    @BindView(R.id.image_star_red_2)
+    ImageView mImageViewRed2;
+    @BindView(R.id.image_star_red_3)
+    ImageView mImageViewRed3;
+    @BindView(R.id.image_star_red_4)
+    ImageView mImageViewRed4;
+    ImageView[] redStars = null;
+
+    @BindView(R.id.image_blue_star_1)
+    ImageView mImageViewBlue1;
+    @BindView(R.id.image_blue_star_2)
+    ImageView mImageViewBlue2;
+    @BindView(R.id.image_blue_star_3)
+    ImageView mImageViewBlue3;
+    @BindView(R.id.image_blue_star_4)
+    ImageView mImageViewBlue4;
+    ImageView[] blueStars = null;
+
+    @BindView(R.id.image_yellow_star_1)
+    ImageView mImageViewYellow1;
+    @BindView(R.id.image_yellow_star_2)
+    ImageView mImageViewYellow2;
+    @BindView(R.id.image_yellow_star_3)
+    ImageView mImageViewYellow3;
+    @BindView(R.id.image_yellow_star_4)
+    ImageView mImageViewYellow4;
+    ImageView[] yellowStars = null;
+
+
+    @BindView(R.id.image_green_star_1)
+    ImageView mImageViewGreen1;
+    @BindView(R.id.image_green_star_2)
+    ImageView mImageViewGreen2;
+    @BindView(R.id.image_green_star_3)
+    ImageView mImageViewGreen3;
+    @BindView(R.id.image_green_star_4)
+    ImageView mImageViewGreen4;
+    ImageView[] greenStars = null;
+
+
+    @BindView(R.id.btn_avatar_blue)
+    Button mBtnAvatarBlue;
+    @BindView(R.id.btn_avatar_red)
+    Button mBtnAvatarRed;
+    @BindView(R.id.btn_avatar_yellow)
+    Button mBtnAvatarYellow;
+    @BindView(R.id.btn_avatar_green)
+    Button mBtnAvatarGreen;
+
+    Button[] avatarBtns = null;
+
+
     private float mXScale = 0;
     private float mYScale = 0;
 
@@ -72,10 +144,10 @@ public class AtyGameClassic extends AppCompatActivity {
     private HashMap<Integer, BeanPlane> mIdMap;
     private List<BeanCell> mBeanCellList;
     private List<BeanRole> mBeanRoleList;
-    //    private List<BeanPlane> mBeanPlanes;
     private boolean isFinish = false;
 
     private int mDice = -1;
+    private BeanRole mCurrentRole;
 
 
     private int mCurrent = BeanCell.COLOR_BLUE;
@@ -84,63 +156,28 @@ public class AtyGameClassic extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.aty_test);
+        setContentView(R.layout.aty_game_sever);
+        ButterKnife.bind(this);
+
+        avatarBtns = new Button[]{mBtnAvatarBlue, mBtnAvatarRed, mBtnAvatarYellow, mBtnAvatarGreen};
+        blueStars = new ImageView[]{mImageViewBlue1, mImageViewBlue2, mImageViewBlue3, mImageViewBlue4};
+        redStars = new ImageView[]{mImageViewRed1, mImageViewRed2, mImageViewRed3, mImageViewRed4};
+        yellowStars = new ImageView[]{mImageViewYellow1, mImageViewYellow2, mImageViewYellow3, mImageViewYellow4};
+        greenStars = new ImageView[]{mImageViewGreen1, mImageViewGreen2, mImageViewGreen3, mImageViewGreen4};
+        rollBtns = new Button[]{mButtonRollBlue, mButtonRollRed, mButtonRollYellow, mButtonRollGreen};
+        findview();
+
+
         mIdMap = new HashMap<>();
         //比例
         getScale();
-
-
         mBeanCellList = BeanBoard.getAllBeanCell();
         mBeanRoleList = BeanBoard.getRoleList();
-        findview();
         initRoleAndPlanes();
         toggleHideyBar();
 
-//        final BeanRole currentRole = mBeanRoleList.get(mCurrent);
-//        currentRole.setBtnDice(mBtnDice);
-//        currentRole.getBtnDice().setClickable(true);
+        mCurrentRole = mBeanRoleList.get(mCurrent);
 
-
-        /**
-         * 抛色子
-         */
-        mBtnDice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-//                Random rand = new Random();
-//                mDice = (rand.nextInt(6) + 1);
-                mDice = 6;
-                mBtnDice.setText(mDice + "");
-
-                BeanRole currentRole = mBeanRoleList.get(mCurrent);
-                currentRole.setBtnDice(mBtnDice);
-                currentRole.getBtnDice().setClickable(true);
-                if (currentRole.isAllPlanesInBase()) {
-                    Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机都在基地");
-                    if (mDice == PLANE_TO_START) {
-                        // TODO: 2017/6/1 飞机除了已经结束的全部可点击
-                        currentRole.movePlaneRoadAndBase();
-                        Log.d(TAG, "当前用户: " + currentRole.getColor() + " 抛出了启动色子，所有的飞机包括在基地的飞机都可以点击");
-                    } else {
-                        Log.d(TAG, "当前用户: " + currentRole.getColor() + " 没有抛出启动色子，并且所有的飞机都在基地，没有办法起飞，直接下一位");
-                        mCurrent = (mCurrent + 1) % 4;
-                        return;
-                    }
-                } else {
-                    // TODO: 2017/6/1 获取所有不在基地的飞机可点击
-                    Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机不都在基地,可以点击不是在基地和终点的飞机");
-                    currentRole.movePlaneRoad();
-                }
-                if (currentRole.isAllPlanesInEnd()) {
-                    toast("游戏结束！");
-                    isFinish = true;
-                } else {
-                    mCurrent = (mCurrent + 1) % 4;
-                }
-            }
-
-        });
     }
 
 
@@ -255,7 +292,7 @@ public class AtyGameClassic extends AppCompatActivity {
      *
      * @param v
      */
-    public void btnOnClick(View v) {
+    public void btnOnClick(View v) throws InterruptedException {
         int id = v.getId();
         BeanPlane plane = mIdMap.get(id);
         if (!plane.isFinish()) {
@@ -270,7 +307,36 @@ public class AtyGameClassic extends AppCompatActivity {
                 }
             }
         }
-        toast("下一位用户");
+        toast("下一位！");
+        mCurrentRole.falseClickAllPlanes();
+        mCurrent = (mCurrent + 1) % 4;
+        if (mCurrent == BeanCell.COLOR_RED) {
+            Thread.sleep(2000);
+            mButtonRollRed.performClick();
+            robotClick(mCurrent);
+        } else if (mCurrent == BeanCell.COLOR_YELLOW) {
+            Thread.sleep(2000);
+            mButtonRollRed.performClick();
+            robotClick(mCurrent);
+        } else if (mCurrent == BeanCell.COLOR_GREEN) {
+            Thread.sleep(2000);
+            mButtonRollRed.performClick();
+            robotClick(mCurrent);
+        }
+
+
+    }
+
+    private void robotClick(int current) {
+
+        BeanRole role = mBeanRoleList.get(current);
+        List<BeanPlane> planes = role.getAllPlanes();
+        for (int i = 0; i < planes.size(); i++) {
+            if (planes.get(i).getStatus() != BeanPlane.STATUS_IN_END) {
+                planes.get(i).getBtn().performClick();
+                break;
+            }
+        }
 
     }
 
@@ -315,5 +381,71 @@ public class AtyGameClassic extends AppCompatActivity {
             }
         }
 
+
     }
+
+    @OnClick(R.id.btn_roll_blue)
+    public void onBtnRollBlueClick() {
+        onRollbtnClick();
+
+    }
+
+    @OnClick(R.id.btn_roll_red)
+    public void onBtnRollRedClick() {
+        onRollbtnClick();
+
+    }
+
+    @OnClick(R.id.btn_roll_yellow)
+    public void onBtnRollYellowClick() {
+        onRollbtnClick();
+
+    }
+
+    @OnClick(R.id.btn_roll_green)
+    public void onBtnRollGreenClick() {
+        onRollbtnClick();
+
+    }
+
+    private void onRollbtnClick() {
+
+
+//                Random rand = new Random();
+//                mDice = (rand.nextInt(6) + 1);
+        mDice = 6;
+        mBtnDice.setText(mDice + "");
+
+        mCurrentRole = mBeanRoleList.get(mCurrent);
+        mCurrentRole.setBtnDice(mBtnDice);
+        mCurrentRole.getBtnDice().setClickable(true);
+        if (mCurrentRole.isAllPlanesInBase()) {
+            Log.d(TAG, "当前用户: " + mCurrentRole.getColor() + " 所有的飞机都在基地");
+            if (mDice == PLANE_TO_START) {
+                // TODO: 2017/6/1 飞机除了已经结束的全部可点击
+                mCurrentRole.movePlaneRoadAndBase();
+                Log.d(TAG, "当前用户: " + mCurrentRole.getColor() + " 抛出了启动色子，所有的飞机包括在基地的飞机都可以点击");
+            } else {
+                Log.d(TAG, "当前用户: " + mCurrentRole.getColor() + " 没有抛出启动色子，并且所有的飞机都在基地，没有办法起飞，直接下一位");
+                mCurrent = (mCurrent + 1) % 4;
+                return;
+            }
+        } else {
+            // TODO: 2017/6/1 获取所有不在基地的飞机可点击
+            Log.d(TAG, "当前用户: " + mCurrentRole.getColor() + " 所有的飞机不都在基地,可以点击不是在基地和终点的飞机");
+            if (mDice == PLANE_TO_START) {
+                // TODO: 2017/6/1 飞机除了已经结束的全部可点击
+                mCurrentRole.movePlaneRoadAndBase();
+                Log.d(TAG, "当前用户: " + mCurrentRole.getColor() + " 抛出了启动色子，所有的飞机包括在基地的飞机都可以点击");
+            } else {
+                mCurrentRole.movePlaneRoad();
+            }
+        }
+
+        if (mCurrentRole.isAllPlanesInEnd()) {
+            toast("游戏结束！");
+            isFinish = true;
+        }
+    }
+
 }

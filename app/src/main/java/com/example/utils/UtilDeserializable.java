@@ -1,5 +1,7 @@
 package com.example.utils;
 
+import android.util.Log;
+
 import com.example.network.broadcast.DataBroaCastSerlied;
 
 import java.util.StringTokenizer;
@@ -8,6 +10,8 @@ import java.util.StringTokenizer;
  * Created by yifeihappy on 16-4-22.
  */
 public class UtilDeserializable {
+    public static final String TAG = "test";
+
     private StringTokenizer stringTokenizer = null;
     DataBroaCastSerlied serliBroacastData = null;
 
@@ -38,6 +42,7 @@ public class UtilDeserializable {
     }
 
     public static DataBroaCastSerlied getFromNetMsgData(String data) {
+        Log.d(TAG, "有没有调用这个方格");
         String[] strs = data.split(",");
         String tag = strs[0];
         String roomIp = strs[1];
@@ -48,6 +53,7 @@ public class UtilDeserializable {
 
         int currentRole = Integer.parseInt(strs[6]);
         int nextRole = Integer.parseInt(strs[7]);
+        Log.d(TAG, "getFromNetMsgData: " + tag + " " + roomIp + " " + dice + " " + planeId + " " + start + " " + end + " " + currentRole + " " + nextRole);
         return new DataBroaCastSerlied(tag, roomIp, dice, planeId, start, end, currentRole, nextRole);
     }
 

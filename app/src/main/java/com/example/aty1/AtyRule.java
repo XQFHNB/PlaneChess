@@ -38,6 +38,6 @@ public class AtyRule extends AppCompatActivity {
 
     @OnClick(R.id.btn_aty_rule_back)
     public void onBtnBackClick() {
-
+        finish();
     }
 }

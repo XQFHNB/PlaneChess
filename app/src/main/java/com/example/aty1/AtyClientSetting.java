@@ -13,7 +13,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.example.aty.AtyGameClient;
 import com.example.network.broadcast.DataBroaCastSerlied;
 import com.example.network.broadcast.HelperIPAdress;
 import com.example.network.model.MsgNet;
@@ -25,6 +24,10 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
  * @author XQF
  * @created 2017/6/6
@@ -35,13 +38,15 @@ public class AtyClientSetting extends AppCompatActivity {
     public static final String TAG = "test";
 
 
-    public static final String ENTER_ROOM = "EN";//ENTERROOM
-    public static final String CONNECT = "CO";//CONNECT TO SERVER
-    public static final String WELCOME = "WE";//WELCOME
-    public static final String REFUSE = "RE";//REFUSE
-    public static final String BEGIN = "BE";//BEGIN
-    public static final String CBACK = "CBA";//BA
+    public static final String CREATE_ROOM = "create_room";//CREATEROOM
+    public static final String CONNECT = "connect_to_sever";//CONNECT TO SERVER
+    public static final String ENTER_ROOM = "enter_room";//ENTERROOM
+    public static final String WELCOME = "welcome";//WELCOME
+    public static final String REFUSE = "refuse";//REFUSE
+    public static final String BEGIN = "begin";//BEGIN
+    public static final String CBACK = "CBA";//CBA
     public static final String RBACK = "RBA";//RBA
+
     public static final int CONNECT_WHAT = 0X300;//CONNECT TO SERVER
     public static final int WELCOME_WHAT = 0x200;
     public static final int REFUSE_WHAT = 0x400;
@@ -59,10 +64,13 @@ public class AtyClientSetting extends AppCompatActivity {
     String mPlayerName = "NULL";
     int mIndex;
     ClientThread clientThread;
-
+    String planeColor;
     Button btnEnter = null;
     private RadioGroup radioGroupColor = null;
     private RadioButton radioButtonRoomerSelected = null;
+
+    @BindView(R.id.btn_aty_usersetting_back)
+    protected Button mButtonBack;
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -102,7 +110,10 @@ public class AtyClientSetting extends AppCompatActivity {
 
                 //客户端进入游戏房间----------------------------------------------------------------------------------------
 
-                AtyGameClient.startAtyGameClient(AtyClientSetting.this, AtyGameClient.class, client, roomIP, mIndex);
+                clientThread.stopGetData();
+                Log.d(TAG, "进入client之前的mIndex" + mIndex);
+                AtyGameClient.startAtyGameClient(AtyClientSetting.this, AtyGameClient.class, mIndex + "", roomIP);
+//                finish();
 
             }
 
@@ -118,12 +129,19 @@ public class AtyClientSetting extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_setting);
+        ButterKnife.bind(this);
 
         Intent intent = getIntent();
+
+
         final Bundle bundle = intent.getExtras();
         final DataBroaCastSerlied roomData = (DataBroaCastSerlied) bundle.getSerializable(ROOM_DATA);
-        String planeColor = roomData.getPlaneColor();//The color the creater of room has selected.
+
+
+        planeColor = roomData.getPlaneColor();//The color the creater of room has selected.
         roomIP = roomData.getRoomIP();//　This room IP.
+
+
         mPlayerIP = HelperIPAdress.getIPByWifi(this);//my IP
         playersNum = roomData.getPlayersNum();
 
@@ -134,8 +152,9 @@ public class AtyClientSetting extends AppCompatActivity {
         radioGroupColor.clearCheck();
 
 
-
         btnEnter = (Button) findViewById(R.id.btnEnter);
+        clientThread = new ClientThread();
+        clientThread.start();
 
         btnEnter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,16 +171,20 @@ public class AtyClientSetting extends AppCompatActivity {
                 int radi;
                 for (radi = 0; radi < radioGroupColor.getChildCount(); radi++) {
                     RadioButton r = (RadioButton) radioGroupColor.getChildAt(radi);
-                    if (r.isChecked()) {
-                        planeColor = String.valueOf(radi);
-                        mIndex = radi;
-                        break;
+                    if (r != radioButtonRoomerSelected) {
+                        if (r.isChecked()) {
+                            planeColor = String.valueOf(radi);
+                            mIndex = radi;
+                            break;
+                        }
                     }
+
                 }
                 if (radi == radioGroupColor.getChildCount()) {
                     Toast.makeText(AtyClientSetting.this, "请输选择一种颜色", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
 
                 DataBroaCastSerlied enterRoomData = new DataBroaCastSerlied(ENTER_ROOM, roomIP, playersNum, mPlayerIP, planeColor, playerName);
                 MsgNet msg = new MsgNet(enterRoomData.toString(), (byte) 0x00);
@@ -176,8 +199,7 @@ public class AtyClientSetting extends AppCompatActivity {
 
             }
         });
-        clientThread = new ClientThread();
-        clientThread.start();
+
     }
 
 
@@ -220,7 +242,7 @@ public class AtyClientSetting extends AppCompatActivity {
                 while (!stopThread) {
                     client.getPort();
                     MsgNet msg = client.getData();//If there is not data,this thread will be blocked.
-                    Log.d(TAG, "客户端接受到了消息" + msg.toString());
+                    Log.d(TAG, "客户端接受到了消息在setting里面" + msg.toString());
                     Message message = handler.obtainMessage();
                     UtilDeserializable deserializable = new UtilDeserializable();
                     DataBroaCastSerlied enterMessage = deserializable.deSerliBroacastData(msg.getData());
@@ -255,6 +277,8 @@ public class AtyClientSetting extends AppCompatActivity {
                         }
 
                         if (enterMessage.getTag().startsWith(BEGIN)) {
+
+                            Log.d(TAG, "转向开始游戏界面");
                             message.what = BEGIN_WHAT;
                             playersNum = enterMessage.getPlayersNum();
                             handler.sendMessage(message);
@@ -284,7 +308,6 @@ public class AtyClientSetting extends AppCompatActivity {
         MsgNet msg = new MsgNet(enterRoomData.toString(), (byte) 0x06);
 
         try {
-
             client.sendToServer(msg);
 
         } catch (SocketException e) {
@@ -301,5 +324,10 @@ public class AtyClientSetting extends AppCompatActivity {
         super.onDestroy();
 
 
+    }
+
+    @OnClick(R.id.btn_aty_usersetting_back)
+    public void onBtnBackClick() {
+        finish();
     }
 }

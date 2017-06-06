@@ -11,7 +11,7 @@
         android:background="@drawable/bg_mountain">
 
         <Button
-            android:id="@+id/btn_aty_select_back"
+            android:id="@+id/btn_aty_start_wifi_back"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/bg_btn_back"/>
@@ -20,6 +20,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginLeft="70dp"
+            android:layout_marginRight="70dp"
             android:background="@drawable/bg_rule"
             android:orientation="vertical"
             android:paddingLeft="70dp"
@@ -34,8 +36,8 @@
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="wrap_content"
-                    android:textColor="#218868"
-                    android:text="难度"/>
+                    android:text="难度"
+                    android:textColor="#218868"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -43,8 +45,8 @@
                     android:orientation="vertical">
 
                     <RelativeLayout
-                        android:layout_width="350dp"
-                        android:layout_height="30dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="20dp"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="20dp"
                         android:background="@drawable/bg_select">
@@ -76,7 +78,7 @@
 
 
                     <RelativeLayout
-                        android:layout_width="350dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="30dp"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="20dp"
@@ -122,8 +124,8 @@
                 <TextView
                     android:layout_width="30dp"
                     android:layout_height="wrap_content"
-                    android:textColor="#218868"
-                    android:text="起飞点数"/>
+                    android:text="起飞点数"
+                    android:textColor="#218868"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -131,8 +133,8 @@
                     android:orientation="vertical">
 
                     <RelativeLayout
-                        android:layout_width="350dp"
-                        android:layout_height="30dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="20dp"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="20dp"
                         android:background="@drawable/bg_select">
@@ -164,7 +166,7 @@
 
 
                     <RelativeLayout
-                        android:layout_width="350dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="30dp"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="20dp"
@@ -200,14 +202,18 @@
 
             </LinearLayout>
 
-            <Button
-                android:id="@+id/btn_start_classic"
-                android:layout_width="200dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center_horizontal"
-                android:background="@drawable/bg_btn_start"/>
 
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_start_classic"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="50dp"
+            android:background="@drawable/bg_btn_createroom"/>
 
 
     </RelativeLayout>

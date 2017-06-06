@@ -255,6 +255,11 @@ public class AtyStartWifiGame extends AppCompatActivity {
     public void onBtnCreateRoomClick() {
         AtyCreateRoom.startAtyCreateRoom(this, AtyCreateRoom.class);
     }
+
+    @OnClick(R.id.btn_aty_start_wifi_back)
+    public void onBtnBack() {
+        finish();
+    }
 }
 
 

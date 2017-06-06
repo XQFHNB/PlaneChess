@@ -34,6 +34,9 @@ public class AtyStartClassicGame extends AppCompatActivity {
     @BindView(R.id.btn_level_diffcult)
     protected Button mButtonLevelDiff;
 
+    @BindView(R.id.btn_aty_start_wifi_back)
+    protected Button mButtonBack;
+
 
     @BindView(R.id.btn_num_256)
     protected Button mButton256;
@@ -59,5 +62,10 @@ public class AtyStartClassicGame extends AppCompatActivity {
     public void onBtnStartClick() {
         Intent intent = new Intent(this, AtyGameClassic.class);
         startActivity(intent);
+    }
+
+    @OnClick(R.id.btn_aty_start_wifi_back)
+    public void onBtnBackClick() {
+        finish();
     }
 }

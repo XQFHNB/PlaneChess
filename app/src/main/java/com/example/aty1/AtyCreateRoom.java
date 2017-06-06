@@ -34,12 +34,14 @@ public class AtyCreateRoom extends AppCompatActivity {
     @BindView(R.id.btn_createroom)
     protected Button btnCreateRoom;
 
-
     @BindView(R.id.radiogroupColor)
     protected RadioGroup mRadioGroup;
 
     @BindView(R.id.edt_aty_create_room_name)
     protected EditText mEditText;
+
+    @BindView(R.id.btn_aty_createroom_back)
+    protected Button mButtonBack;
 
     @BindView(R.id.btn_num_2)
     protected Button mButton2;
@@ -131,6 +133,10 @@ public class AtyCreateRoom extends AppCompatActivity {
         mButton4.setBackground(getResources().getDrawable(R.drawable.bg_select_circle));
     }
 
+    @OnClick(R.id.btn_aty_createroom_back)
+    public void onBtnBackClick() {
+        finish();
+    }
 
     public void toast(String str) {
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();

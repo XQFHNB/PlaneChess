@@ -1,6 +1,7 @@
 package com.example.bean;
 
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,9 +144,16 @@ public class BeanRole {
         List<BeanPlane> beanPlanesOnRoad = getBeanPlanesOnTheRoad();
         List<BeanPlane> beanPlanesInBase = getBeanPlanesInBase();
         beanPlanesInBase.addAll(beanPlanesOnRoad);
-        for (int i = 0; i <  beanPlanesInBase.size(); i++) {
-            Button btn =  beanPlanesInBase.get(i).getBtn();
+        for (int i = 0; i < beanPlanesInBase.size(); i++) {
+            Button btn = beanPlanesInBase.get(i).getBtn();
             btn.setClickable(true);
+        }
+    }
+
+    public void falseClickAllPlanes() {
+        List<BeanPlane> list = getAllPlanes();
+        for (int i = 0; i < list.size(); i++) {
+            list.get(i).getBtn().setClickable(false);
         }
     }
 }

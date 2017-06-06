@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PlaneChess</string>
+    <string name="ruel">首先各方需要在各方颜色的营地等待起飞，各方轮流投掷骰子，只有投到6才能起飞，并且获得再一次投掷机会。起飞后的飞行棋即可按照投到的骰子数进行正常走动！而没有投到6的玩家只能默默等待了！</string>
 </resources>
