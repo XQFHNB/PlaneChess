@@ -23,33 +23,14 @@ import java.net.SocketException;
  */
 public class Client implements Serializable {
 
+    public static String TAG = "client";
+
     private InetAddress addr;       //服务器地址
     private int port;               //服务器端口
     private Socket socket = null;
     private ThreadClientRead mThreadClientRead = null;
     private PrintWriter out = null;
     QueueMsg msg = new QueueMsg();
-
-//    /**
-//     * 初始化Client并新建一个线程监听服务器发送来的数据
-//     *
-//     * @param inet 服务器地址
-//     * @param p    服务器端口
-//     * @throws IOException
-//     */
-//    public Client(InetAddress inet, int p) throws IOException {
-//        this.addr = inet;
-//        this.port = p;
-//        this.socket = new Socket(this.addr, this.port);
-//        try {
-//            init();
-//        } catch (IOException e) {
-//            //打开输入输出流失败
-//            mThreadClientRead = null;
-//            this.out = null;
-//            e.printStackTrace();
-//        }
-//    }
 
 
 //    -----------------------------------------------------------------------------------------------------------------------
@@ -117,6 +98,8 @@ public class Client implements Serializable {
      * @SocketException 发送失败
      */
     public void sendToServer(MsgNet data) throws SocketException {
+
+        Log.d(TAG, "向服务器传送的内容" + data.toString());
         if (out.checkError()) {
             throw new SocketException();
         }

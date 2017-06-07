@@ -35,7 +35,7 @@ import butterknife.OnClick;
 
 public class AtyClientSetting extends AppCompatActivity {
 
-    public static final String TAG = "test";
+    public static final String TAG = "atyclientsetting";
 
 
     public static final String CREATE_ROOM = "create_room";//CREATEROOM
@@ -203,13 +203,49 @@ public class AtyClientSetting extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        //playerNum == mIndex;
+        DataBroaCastSerlied enterRoomData = new DataBroaCastSerlied(CBACK, roomIP, String.valueOf(mIndex), mPlayerIP, mPlaneColor, mPlayerName);
+        MsgNet msg = new MsgNet(enterRoomData.toString(), (byte) 0x06);
+
+        try {
+            client.sendToServer(msg);
+
+        } catch (SocketException e) {
+            e.printStackTrace();
+            Toast.makeText(AtyClientSetting.this, "Back message Send to server failed", Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        clientThread.stopGetData();
+        client.close();
+        super.onDestroy();
+
+
+    }
+
+    @OnClick(R.id.btn_aty_usersetting_back)
+    public void onBtnBackClick() {
+        finish();
+    }
+
+
+    /**
+     * 在用户设置界面管理消息的线程-------------------------------------------------------------------------------------
+     */
+
     class ClientThread extends Thread {
         public Object myLock = new Object();
         private volatile boolean stopThread = false;
 
         public void stopGetData() {
             stopThread = true;
-            client.close();
+//            client.close();
             this.interrupt();
 
         }
@@ -219,25 +255,11 @@ public class AtyClientSetting extends AppCompatActivity {
             super.run();
             try {
 
-
-//                ------------------------------------------------------------------------------------------------------
-
-
-//                client = new Client(InetAddress.getByName(roomIP), SOCKET_PORT);
-
                 client = Client.newInstance(InetAddress.getByName(roomIP), SOCKET_PORT);
-
-                //                ------------------------------------------------------------------------------------------------------
-
             } catch (IOException e) {
-
-
-                /////////////////////////////////////////////
                 Log.d(TAG, e.getMessage());
                 e.printStackTrace();
             }
-
-
             try {
                 while (!stopThread) {
                     client.getPort();
@@ -298,36 +320,5 @@ public class AtyClientSetting extends AppCompatActivity {
 
 
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        //playerNum == mIndex;
-        DataBroaCastSerlied enterRoomData = new DataBroaCastSerlied(CBACK, roomIP, String.valueOf(mIndex), mPlayerIP, mPlaneColor, mPlayerName);
-        MsgNet msg = new MsgNet(enterRoomData.toString(), (byte) 0x06);
-
-        try {
-            client.sendToServer(msg);
-
-        } catch (SocketException e) {
-            e.printStackTrace();
-            Toast.makeText(AtyClientSetting.this, "Back message Send to server failed", Toast.LENGTH_LONG).show();
-        }
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        clientThread.stopGetData();
-        client.close();
-        super.onDestroy();
-
-
-    }
-
-    @OnClick(R.id.btn_aty_usersetting_back)
-    public void onBtnBackClick() {
-        finish();
     }
 }

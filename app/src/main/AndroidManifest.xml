@@ -33,6 +33,7 @@
         <activity android:name="com.example.aty1.AtyWaitClients"></activity>
         <activity android:name="com.example.aty1.AtyClientSetting"></activity>
         <activity android:name="com.example.aty1.AtyStartWifiGame"></activity>
+        <activity android:name="com.example.aty1.AtyGameClassic"></activity>
     </application>
 
 </manifest>

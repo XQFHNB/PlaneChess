@@ -38,10 +38,10 @@
 
             <EditText
                 android:id="@+id/edtName"
-
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
+                android:textColor="@color/textcolor"
                 android:layout_marginRight="30dp"
                 android:background="@null"
                 />
@@ -65,7 +65,6 @@
                 <TextView
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
-
                     android:layout_marginLeft="5dp"
                     android:text="选择飞机:"
                     android:textColor="@color/textcolor"/>
@@ -75,34 +74,40 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="20dp"
                     android:orientation="horizontal">
 
                     <RadioButton
                         android:id="@+id/redradio"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bule"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/blue"
                         android:textColor="@color/textcolor"/>
 
                     <RadioButton
                         android:id="@+id/yelloradio"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Red"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="20dp"
+                        android:background="@drawable/red"
                         android:textColor="@color/textcolor"/>
 
                     <RadioButton
                         android:id="@+id/blueradio"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Yellow"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="20dp"
+
+                        android:background="@drawable/yellow"
                         android:textColor="@color/textcolor"/>
 
                     <RadioButton
                         android:id="@+id/whiteradio1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Green"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+
+                        android:layout_marginLeft="20dp"
+                        android:background="@drawable/green"
                         android:textColor="@color/textcolor"/>
                 </RadioGroup>
             </LinearLayout>
@@ -117,7 +122,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="50dp"
-            android:background="@drawable/bg_btn_startxml"
+            android:background="@drawable/bg_btn_start"
             />
     </RelativeLayout>
 

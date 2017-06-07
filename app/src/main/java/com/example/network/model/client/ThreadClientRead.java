@@ -1,5 +1,7 @@
 package com.example.network.model.client;
 
+import android.util.Log;
+
 import com.example.network.model.MsgNet;
 
 import java.io.BufferedReader;
@@ -16,6 +18,8 @@ import java.nio.channels.ClosedByInterruptException;
  * 客户端监听接收数据的线程
  */
 public class ThreadClientRead extends Thread {
+    public static final String TAG1 = "threadclientread";
+
     private Client s;           //客户端的引用
     private BufferedReader in = null;   //连接的input流
 
@@ -33,19 +37,20 @@ public class ThreadClientRead extends Thread {
                     throw new InterruptedException("accept thread has been interrupter");
                 }
                 String str = in.readLine();
-                if(str == null)
+                if (str == null)
                     throw new SocketException("data is null");
                 byte ch = (byte) str.charAt(0);
                 String info = str.substring(1);
-                MsgNet m = new MsgNet(info, (byte) (ch&0x03));
+                MsgNet m = new MsgNet(info, (byte) (ch & 0x03));
                 synchronized (s.msg) {
                     s.msg.addData(m);
+                    Log.d(TAG1, "\n每次收到新信息后客户端消息队列中的内容" + s.msg.toString());
                 }
             }
         } catch (ClosedByInterruptException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            if(e instanceof SocketException) {
+            if (e instanceof SocketException) {
                 //读取数据出现错误，或者连接已关闭
             }
             e.printStackTrace();

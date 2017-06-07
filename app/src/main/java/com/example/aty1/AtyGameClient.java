@@ -58,7 +58,9 @@ public class AtyGameClient extends AppCompatActivity {
 
     public static final int WHAT_TURN_YOU = 3;
 
-    public static final String TAG = "test";
+    public static final String TAG = "atygameclient";
+    public static final String TAG1 = "";
+
 
     public static final int PLANE_TO_START = 6;
     public static final String MOVE_PLANE = "move";
@@ -342,6 +344,34 @@ public class AtyGameClient extends AppCompatActivity {
             }
         }
         indexPlaneEnd = plane.getAfterMoveIndexFinal();
+        if (currentRole.isAllPlanesInEnd()) {
+            toast("游戏结束！");
+
+
+            //向服务器发送游戏结束的消息---------------------------------------------------------------------------------------------------------
+            DataBroaCastSerlied dataToSever = new DataBroaCastSerlied(MOVE_END, mRoomIp, mDice, 0, 0, 0, 0, 0);
+            MsgNet msg = new MsgNet(dataToSever.toString(), (byte) 0x00);
+            try {
+                mClient.sendToServer(msg);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
+            isFinish = true;
+
+
+        } else {
+
+            //向服务器发送本client移动飞机的位置信息--------------------------------------------------------------------------------------------
+            DataBroaCastSerlied dataToSever = new DataBroaCastSerlied(MOVE_PLANE, mRoomIp, mDice, mIdBtnClicked, 0, indexPlaneEnd, 0, 0);
+
+            Log.d(TAG, "玩家正常移动飞机向服务器发送消息内容：" + dataToSever.getGameData());
+            MsgNet msg = new MsgNet(dataToSever.getGameData(), (byte) 0x00);
+            try {
+                mClient.sendToServer(msg);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
+        }
         toast("下一位用户");
 
     }
@@ -609,32 +639,7 @@ public class AtyGameClient extends AppCompatActivity {
             Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机不都在基地,可以点击不是在基地和终点的飞机");
             currentRole.movePlaneRoad();
         }
-        if (currentRole.isAllPlanesInEnd()) {
-            toast("游戏结束！");
-
-
-            //向服务器发送游戏结束的消息---------------------------------------------------------------------------------------------------------
-            DataBroaCastSerlied dataToSever = new DataBroaCastSerlied(MOVE_END, mRoomIp, mDice, 0, 0, 0, 0, 0);
-            MsgNet msg = new MsgNet(dataToSever.toString(), (byte) 0x00);
-            try {
-                mClient.sendToServer(msg);
-            } catch (SocketException e) {
-                e.printStackTrace();
-            }
-            isFinish = true;
-
-
-        } else {
-
-            //向服务器发送本client移动飞机的位置信息--------------------------------------------------------------------------------------------
-            DataBroaCastSerlied dataToSever = new DataBroaCastSerlied(MOVE_PLANE, mRoomIp, mDice, mIdBtnClicked, 0, indexPlaneEnd, 0, 0);
-            MsgNet msg = new MsgNet(dataToSever.getGameData(), (byte) 0x00);
-            try {
-                mClient.sendToServer(msg);
-            } catch (SocketException e) {
-                e.printStackTrace();
-            }
-        }
+//
     }
 
 }

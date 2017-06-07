@@ -218,6 +218,8 @@ public class AtyWaitClients extends AppCompatActivity {
                 dataToAllClients = new DataBroaCastSerlied(BEGIN, roomIP, String.valueOf(playersNum), playersIP, playersColor, playersName);
                 MsgNet msgToSend = new MsgNet(dataToAllClients.toString(), (byte) 0x00);
                 serverInTel.sendToAll(msgToSend);
+
+                serverAcceptThread.setStopThread();
                 AtyGameSever.startAtyGameSever(AtyWaitClients.this, AtyGameSever.class, mRoomColor, roomIP);
             }
         });
@@ -235,7 +237,7 @@ public class AtyWaitClients extends AppCompatActivity {
 
             stopThread = true;
             this.interrupt();
-            serverInTel.closeAll();
+//            serverInTel.closeAll();
         }
 
         @Override

@@ -54,4 +54,17 @@ public class QueueMsg {
             mq.notify();
         }
     }
+
+    @Override
+    public String toString() {
+
+        StringBuffer sb = new StringBuffer();
+
+        for (int i = 0; i < mq.size(); i++) {
+            MsgNet msgNet = mq.get(i);
+            sb.append(msgNet.toString() + "\n");
+        }
+        return sb.toString();
+
+    }
 }
