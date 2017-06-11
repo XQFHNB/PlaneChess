@@ -1,4 +1,4 @@
-package com.example.aty1;
+package com.example.aty1.game_classic;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 
+import com.example.aty1.game_classic.AtyGameClassic;
 import com.example.yifeihappy.planechess.R;
 
 import butterknife.BindView;

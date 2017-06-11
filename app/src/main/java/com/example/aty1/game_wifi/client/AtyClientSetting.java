@@ -1,4 +1,4 @@
-package com.example.aty1;
+package com.example.aty1.game_wifi.client;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +13,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.example.aty1.AtyGameClient;
 import com.example.network.broadcast.DataBroaCastSerlied;
 import com.example.network.broadcast.HelperIPAdress;
 import com.example.network.model.MsgNet;
@@ -69,6 +70,11 @@ public class AtyClientSetting extends AppCompatActivity {
     private RadioGroup radioGroupColor = null;
     private RadioButton radioButtonRoomerSelected = null;
 
+
+    private String mRolesNames;
+    private String mRolesColors;
+
+
     @BindView(R.id.btn_aty_usersetting_back)
     protected Button mButtonBack;
     Handler handler = new Handler() {
@@ -112,7 +118,9 @@ public class AtyClientSetting extends AppCompatActivity {
 
                 clientThread.stopGetData();
                 Log.d(TAG, "进入client之前的mIndex" + mIndex);
-                AtyGameClient.startAtyGameClient(AtyClientSetting.this, AtyGameClient.class, mIndex + "", roomIP);
+
+
+                AtyGameClient.startAtyGameClient(AtyClientSetting.this, AtyGameClient.class, mIndex + "", roomIP, mRolesNames, mRolesColors);
 //                finish();
 
             }
@@ -176,6 +184,8 @@ public class AtyClientSetting extends AppCompatActivity {
                             planeColor = String.valueOf(radi);
                             mIndex = radi;
                             break;
+                        } else {
+                            r.setBackground(null);
                         }
                     }
 
@@ -196,7 +206,9 @@ public class AtyClientSetting extends AppCompatActivity {
                     Toast.makeText(AtyClientSetting.this, "Send to server failed", Toast.LENGTH_LONG).show();
                 }
                 btnEnter.setEnabled(false);//wait for check
-
+                btnEnter.setBackground(getResources().getDrawable(R.drawable.bg_btn_watingforstart));
+                btnEnter.setText("等待房主开始游戏");
+                btnEnter.setTextColor(getResources().getColor(R.color.white));
             }
         });
 
@@ -303,6 +315,8 @@ public class AtyClientSetting extends AppCompatActivity {
                             Log.d(TAG, "转向开始游戏界面");
                             message.what = BEGIN_WHAT;
                             playersNum = enterMessage.getPlayersNum();
+                            mRolesNames = enterMessage.getPlayerName();
+                            mRolesColors = enterMessage.getPlaneColor();
                             handler.sendMessage(message);
                         }
 

@@ -1,4 +1,4 @@
-package com.example.aty1;
+package com.example.aty1.game_classic;
 
 import android.graphics.Point;
 import android.os.Build;
@@ -229,7 +229,6 @@ public class AtyGameClassic extends AppCompatActivity {
                     role.setAllPlanes(mBeanPlanes);
                 }
             } else if (i == BeanCell.COLOR_RED) {
-//                mBeanPlanes = role.getAllPlanes();
                 for (int j = 0; j < mBtnsBlue.length; j++) {
                     BeanPlane plane = new BeanPlane(index++, 13, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_RED, mBtnsRed[j], false);
                     mIdMap.put(mIDRed[j], plane);
@@ -238,7 +237,6 @@ public class AtyGameClassic extends AppCompatActivity {
                     role.setAllPlanes(mBeanPlanes);
                 }
             } else if (i == BeanCell.COLOR_YELLOW) {
-//                mBeanPlanes = role.getAllPlanes();
                 for (int j = 0; j < mBtnsBlue.length; j++) {
                     BeanPlane plane = new BeanPlane(index++, 26, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_YELLOW, mBtnsYellow[j], false);
                     mIdMap.put(mIDYellow[j], plane);
@@ -247,7 +245,6 @@ public class AtyGameClassic extends AppCompatActivity {
                     role.setAllPlanes(mBeanPlanes);
                 }
             } else if (i == BeanCell.COLOR_GREEN) {
-//                mBeanPlanes = role.getAllPlanes();
                 for (int j = 0; j < mBtnsBlue.length; j++) {
                     BeanPlane plane = new BeanPlane(index++, 39, BeanPlane.STATUS_IN_BASE, BeanCell.COLOR_GREEN, mBtnsGreen[j], false);
                     mIdMap.put(mIDGreen[j], plane);

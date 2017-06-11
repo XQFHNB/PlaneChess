@@ -1,4 +1,4 @@
-package com.example.aty1;
+package com.example.aty1.game_rule;
 
 import android.content.Context;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package com.example.aty1;
+package com.example.aty1.game_wifi.sever;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.aty1.AtyMain;
 import com.example.network.broadcast.DataBroaCastSerlied;
 import com.example.network.broadcast.HelperBroascastGroup;
 import com.example.network.broadcast.HelperIPAdress;
@@ -94,6 +95,9 @@ public class AtyWaitClients extends AppCompatActivity {
     @BindView(R.id.btn_aty_wait_clients)
     protected Button mButtonBack;
 
+    @BindView(R.id.room_name)
+    protected TextView mTextViewRoomName;
+
     @BindView(R.id.player1)
     protected LinearLayout mLinearLayoutPlayer1;
     @BindView(R.id.player2)
@@ -159,6 +163,8 @@ public class AtyWaitClients extends AppCompatActivity {
 
         mRoomColor = bundle.getString("rolecolor");
         mRoomName = bundle.getString("roomname");
+
+        mTextViewRoomName.setText("房间名：" + mRoomName);
         mLinearLayoutPlayer1.setBackgroundColor(mPlayerColors[0]);
 
 //        txtRoomPlayerNum.setText("飞机起飞点数：" + bundle.getString("startNums") + "\n" + "人数：" +

@@ -1,4 +1,4 @@
-package com.example.aty1;
+package com.example.aty1.game_wifi.sever;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.aty1.game_wifi.client.AtyClientSetting;
 import com.example.bean.BeanRoomInfo;
 import com.example.network.broadcast.DataBroaCastSerlied;
 import com.example.network.broadcast.HelperBroadCastBase;
