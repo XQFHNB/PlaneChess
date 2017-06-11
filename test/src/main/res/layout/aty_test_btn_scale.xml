@@ -4,9 +4,11 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <TextView
+    <Button
+        android:id="@+id/btn_test"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="hehh"/>
+        android:layout_gravity="center"
+        android:text="测试"/>
 
 </LinearLayout>

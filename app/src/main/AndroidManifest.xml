@@ -23,17 +23,37 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.example.aty1.AtyGameClient"></activity>
-        <activity android:name="com.example.aty1.AtyGameSever"></activity>
+        <activity
+            android:name="com.example.aty1.game_wifi.client.AtyGameClient"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name="com.example.aty1.game_wifi.sever.AtyGameSever"
+            android:screenOrientation="landscape"></activity>
 
-        <activity android:name="com.example.aty1.AtySelectGame"></activity>
-        <activity android:name="com.example.aty1.AtyRule"></activity>
-        <activity android:name="com.example.aty1.AtyStartClassicGame"></activity>
-        <activity android:name="com.example.aty1.AtyCreateRoom"></activity>
-        <activity android:name="com.example.aty1.AtyWaitClients"></activity>
-        <activity android:name="com.example.aty1.AtyClientSetting"></activity>
-        <activity android:name="com.example.aty1.AtyStartWifiGame"></activity>
-        <activity android:name="com.example.aty1.AtyGameClassic"></activity>
+        <activity
+            android:name="com.example.aty1.select_game.AtySelectGame"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name="com.example.aty1.game_rule.AtyRule"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name="com.example.aty1.game_classic.AtyStartClassicGame"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name="com.example.aty1.game_wifi.sever.AtyCreateRoom"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name="com.example.aty1.game_wifi.sever.AtyWaitClients"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name="com.example.aty1.game_wifi.client.AtyClientSetting"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name="com.example.aty1.game_wifi.sever.AtyStartWifiGame"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name="com.example.aty1.game_classic.AtyGameClassic"
+            android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>

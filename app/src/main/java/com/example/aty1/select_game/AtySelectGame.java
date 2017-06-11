@@ -7,8 +7,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 
-import com.example.aty1.AtyStartClassicGame;
-import com.example.aty1.AtyStartWifiGame;
+import com.example.aty1.game_classic.AtyStartClassicGame;
+import com.example.aty1.game_wifi.sever.AtyStartWifiGame;
 import com.example.yifeihappy.planechess.R;
 
 import butterknife.BindView;

@@ -13,7 +13,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.example.aty1.AtyGameClient;
 import com.example.network.broadcast.DataBroaCastSerlied;
 import com.example.network.broadcast.HelperIPAdress;
 import com.example.network.model.MsgNet;

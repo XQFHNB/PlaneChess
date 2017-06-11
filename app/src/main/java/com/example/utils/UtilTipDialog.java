@@ -5,4 +5,8 @@ package com.example.utils;
  * @created 2017/6/8
  */
 public class UtilTipDialog {
+
+    public static void showDialog(String string) {
+
+    }
 }

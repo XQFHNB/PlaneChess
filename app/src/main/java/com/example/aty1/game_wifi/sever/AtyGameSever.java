@@ -387,7 +387,7 @@ public class AtyGameSever extends AppCompatActivity {
 
     private void findview() {
         mBtnDice = (Button) findViewById(R.id.btn_click);
-        mBtnDice.setBackgroundResource(R.drawable.diceanim);
+        mBtnDice.setBackgroundResource(R.drawable.dice_anim);
         mAnimationDrawable = (AnimationDrawable) mBtnDice.getBackground();
 
 

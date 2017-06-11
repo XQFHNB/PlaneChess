@@ -11,7 +11,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.example.aty1.AtyWaitClients;
 import com.example.yifeihappy.planechess.R;
 
 import butterknife.BindView;

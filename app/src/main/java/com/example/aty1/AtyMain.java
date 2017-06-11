@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 
+import com.example.aty1.game_rule.AtyRule;
+import com.example.aty1.select_game.AtySelectGame;
 import com.example.yifeihappy.planechess.R;
 
 import butterknife.BindView;

@@ -64,7 +64,6 @@
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:layout_centerInParent="true"
-                            android:background="@drawable/bg_select_circle"
                             android:visibility="invisible"/>
 
                         <Button
@@ -72,7 +71,6 @@
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:layout_alignParentRight="true"
-                            android:background="@drawable/bg_select_circle"
                             android:visibility="invisible"/>
                     </RelativeLayout>
 
@@ -152,7 +150,6 @@
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:layout_centerInParent="true"
-                            android:background="@drawable/bg_select_circle"
                             android:visibility="invisible"/>
 
                         <Button
@@ -160,7 +157,6 @@
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:layout_alignParentRight="true"
-                            android:background="@drawable/bg_select_circle"
                             android:visibility="invisible"/>
                     </RelativeLayout>
 

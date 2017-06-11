@@ -1,6 +1,7 @@
 package com.example.bean;
 
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
@@ -14,12 +15,32 @@ public class BeanRole {
 
     private List<BeanPlane> mBeanPlanes;
 
+    public ImageView[] getBeanStars() {
+        return mBeanStars;
+    }
+
+    public void setBeanStars(ImageView[] beanStars) {
+        mBeanStars = beanStars;
+    }
+
+    private ImageView[] mBeanStars;
+
+
     private int mColor;
     private boolean isFinish = true;
 
     private boolean isAllPlanesInBase = true;
 
     private Button mBtnDice;
+    private boolean isMandatory;
+
+    public boolean isMandatory() {
+        return isMandatory;
+    }
+
+    public void setMandatory(boolean mandatory) {
+        isMandatory = mandatory;
+    }
 
     public Button getBtnDice() {
         return mBtnDice;
@@ -86,6 +107,18 @@ public class BeanRole {
         for (int i = 0; i < mBeanPlanes.size(); i++) {
             BeanPlane plane = mBeanPlanes.get(i);
             if (plane.getStatus() == BeanPlane.STATUS_IN_BASE) {
+                result.add(plane);
+            }
+        }
+        return result;
+    }
+
+
+    public List<BeanPlane> getBeanPlanesInEnd() {
+        List<BeanPlane> result = new ArrayList<>();
+        for (int i = 0; i < mBeanPlanes.size(); i++) {
+            BeanPlane plane = mBeanPlanes.get(i);
+            if (plane.getStatus() == BeanPlane.STATUS_IN_END) {
                 result.add(plane);
             }
         }

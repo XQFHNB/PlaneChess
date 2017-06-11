@@ -446,5 +446,6 @@ public class BeanPlane {
         float destY = (cell.getY() - 2 * x) * mYScale;
         btn.setX(destX);
         btn.setY(destY);
+
     }
 }
