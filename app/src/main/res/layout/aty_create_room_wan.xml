@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/bg_main_empty"
+              android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_mountain">
+
+        <Button
+            android:id="@+id/btn_aty_createroom_back"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/bg_btn_back"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="70dp"
+            android:layout_marginRight="70dp"
+            android:background="@drawable/bg_rule"
+            android:orientation="vertical"
+            android:paddingLeft="70dp"
+            android:paddingRight="70dp"
+            >
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="50dp"
+                android:text="创建房间"
+                android:textColor="#218868"/>
+
+            <EditText
+                android:id="@+id/edt_aty_create_room_name_wan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="30dp"
+                android:background="@null"
+                android:hint="房间名称"
+                android:textColor="@color/textcolor"
+                android:textColorHint="#F0F0F0"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="30dp"
+                android:background="@drawable/line">
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="20dp">
+
+                <TextView
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:text="选择飞机"
+                    android:textColor="#218868"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RadioGroup
+                        android:id="@+id/radiogroupColorWan"
+                        android:layout_width="350dp"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/radioBlue"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:background="@drawable/blue"
+                            android:checked="true"/>
+
+
+                        <RadioButton
+                            android:id="@+id/radioRed"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_marginLeft="15dp"
+                            android:background="@drawable/red"
+                            />
+
+                        <RadioButton
+                            android:id="@+id/radioYellow"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_marginLeft="15dp"
+
+                            android:background="@drawable/yellow"/>
+
+                        <RadioButton
+                            android:id="@+id/radioGreen"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_marginLeft="15dp"
+                            android:background="@drawable/green"/>
+                    </RadioGroup>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_createroom_wan"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="50dp"
+            android:background="@drawable/bg_btn_createroom"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

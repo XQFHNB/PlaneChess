@@ -9,13 +9,14 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
+        android:name="com.example.module_a_main.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
         <activity
-            android:name="com.example.aty1.AtyMain"
+            android:name="com.example.module_a_main.AtyMain"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -24,35 +25,35 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.aty1.game_wifi.client.AtyGameClient"
+            android:name="com.example.module_b_lan.game_wifi.client.AtyGameClient"
             android:screenOrientation="landscape"></activity>
         <activity
-            android:name="com.example.aty1.game_wifi.sever.AtyGameSever"
+            android:name="com.example.module_b_lan.game_wifi.sever.AtyGameSever"
             android:screenOrientation="landscape"></activity>
 
         <activity
-            android:name="com.example.aty1.select_game.AtySelectGame"
+            android:name="com.example.module_b_lan.game_select.AtySelectGame"
             android:screenOrientation="landscape"></activity>
         <activity
-            android:name="com.example.aty1.game_rule.AtyRule"
+            android:name="com.example.module_b_lan.game_rule.AtyRule"
             android:screenOrientation="landscape"></activity>
         <activity
-            android:name="com.example.aty1.game_classic.AtyStartClassicGame"
+            android:name="com.example.module_b_lan.game_classic.AtyStartClassicGame"
             android:screenOrientation="landscape"></activity>
         <activity
-            android:name="com.example.aty1.game_wifi.sever.AtyCreateRoom"
+            android:name="com.example.module_b_lan.game_wifi.sever.AtyCreateRoom"
             android:screenOrientation="landscape"></activity>
         <activity
-            android:name="com.example.aty1.game_wifi.sever.AtyWaitClients"
+            android:name="com.example.module_b_lan.game_wifi.sever.AtyWaitClients"
             android:screenOrientation="landscape"></activity>
         <activity
-            android:name="com.example.aty1.game_wifi.client.AtyClientSetting"
+            android:name="com.example.module_b_lan.game_wifi.client.AtyClientSetting"
             android:screenOrientation="landscape"></activity>
         <activity
-            android:name="com.example.aty1.game_wifi.sever.AtyStartWifiGame"
+            android:name="com.example.module_b_lan.game_wifi.sever.AtyStartWifiGame"
             android:screenOrientation="landscape"></activity>
         <activity
-            android:name="com.example.aty1.game_classic.AtyGameClassic"
+            android:name="com.example.module_b_lan.game_classic.AtyGameClassic"
             android:screenOrientation="landscape"></activity>
     </application>
 
