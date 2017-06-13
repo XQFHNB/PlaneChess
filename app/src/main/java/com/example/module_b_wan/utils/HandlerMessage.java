@@ -15,11 +15,11 @@ import de.greenrobot.event.EventBus;
  * @author XQF
  * @created 2017/6/12
  */
-public class UtilMessageHandler extends AVIMTypedMessageHandler<AVIMTypedMessage> {
+public class HandlerMessage extends AVIMTypedMessageHandler<AVIMTypedMessage> {
 
     private Context context;
 
-    public UtilMessageHandler(Context context) {
+    public HandlerMessage(Context context) {
         this.context = context;
     }
 

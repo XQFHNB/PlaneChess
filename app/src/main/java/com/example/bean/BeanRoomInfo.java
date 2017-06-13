@@ -1,4 +1,4 @@
-package com.example.bean.bean_lan;
+package com.example.bean;
 
 import com.example.module_b_lan.network.broadcast.DataBroaCastSerlied;
 
@@ -11,6 +11,15 @@ public class BeanRoomInfo {
     private String mIp;
     private DataBroaCastSerlied mRoomData;
     private String mPlayersSum;
+    private String mConversationId;
+
+    public String getConversationId() {
+        return mConversationId;
+    }
+
+    public void setConversationId(String conversationId) {
+        mConversationId = conversationId;
+    }
 
     public String getPlayersSum() {
         return mPlayersSum;

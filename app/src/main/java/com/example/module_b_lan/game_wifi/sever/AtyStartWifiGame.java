@@ -16,7 +16,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.module_b_lan.game_wifi.client.AtyClientSetting;
-import com.example.bean.bean_lan.BeanRoomInfo;
+import com.example.bean.BeanRoomInfo;
 import com.example.module_b_lan.network.broadcast.DataBroaCastSerlied;
 import com.example.module_b_lan.network.broadcast.HelperBroadCastBase;
 import com.example.module_b_lan.network.broadcast.HelperBroascastGroup;

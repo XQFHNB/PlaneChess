@@ -28,7 +28,7 @@ import butterknife.OnClick;
  * @author XQF
  * @created 2017/6/12
  */
-public class AtyCreateRoom extends AppCompatActivity implements IViewWan {
+public class AtyCreateRoom extends AtyBase implements IViewWan {
 
     @BindView(R.id.radiogroupColorWan)
     protected RadioGroup mRadioGroup;
@@ -53,7 +53,6 @@ public class AtyCreateRoom extends AppCompatActivity implements IViewWan {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.aty_create_room_wan);
-        ButterKnife.bind(this);
         mIPresenterWan = new PresenterWanImpl(this);
         mRoomName = new String();
         mPlaysSum = new String();
@@ -61,7 +60,7 @@ public class AtyCreateRoom extends AppCompatActivity implements IViewWan {
     }
 
     @OnClick(R.id.btn_createroom_wan)
-    public void onBtnCreateRoom() {
+    public void onBtnCreateRoomClick() {
         if (TextUtils.isEmpty(mEditTextName.getText())) {
             toast("请输入房间名称");
             return;
@@ -90,12 +89,9 @@ public class AtyCreateRoom extends AppCompatActivity implements IViewWan {
             mIPresenterWan.createConversationByNameAndType(mAVIMClient, mRoomName);
         }
         String conversationId = mAVIMConversation.getConversationId();
-        AtyWaitClients.startAtyWaitClients(this, AtyWaitClients.class, conversationId);
+        AtyWaitClients.startAtyWaitClients(this, AtyWaitClients.class, conversationId,mRoomName);
     }
 
-    public void toast(String str) {
-        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
-    }
 
     @Override
     public void getConversation(AVIMConversation conversation) {
