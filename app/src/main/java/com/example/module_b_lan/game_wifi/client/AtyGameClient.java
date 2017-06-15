@@ -3,6 +3,7 @@ package com.example.module_b_lan.game_wifi.client;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,6 +12,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -31,6 +34,8 @@ import java.net.SocketException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -211,6 +216,8 @@ public class AtyGameClient extends AppCompatActivity {
     private int mStars;
 
     private BeanRole currentRole;
+    AnimationDrawable mAnimationDrawable;
+    Animation mAnimationBtnScale;
 
 
     //房间内所有人员的颜色和名字
@@ -227,15 +234,17 @@ public class AtyGameClient extends AppCompatActivity {
             int what = msg.what;
             if (what == WHAT_MOVE_PLAEN) {//移动不属于本客户端的飞机-------------------------------------------------------------------------------------------------
                 // TODO: 2017/6/4 移动棋子
-                movePlane(mIdBtnClicked, mStart, mEnd);
-                mBtnDice.setText(mDice + " ");
+                startAnimationAndMovePlane(msg, true);
+
                 toast("下一位" + mNextRole + "的回合");
             } else if (what == WHAT_MOVE_NO) {//服务器发来信息的客户端没有启动，但是还是要设置一下色子数字---------------------------------------------------------------
                 // TODO: 2017/6/4 移动棋子
-                mBtnDice.setText(mDice + " ");
+                startAnimationAndMovePlane(msg, false);
+
                 toast("下一位" + mNextRole + "的回合");
 
             } else if (what == WHAT_MOVE_END) {//服务器发来的游戏结束的消息，收到消息后进行对应调整，停止客户端的接收线程---------------------------------------------------
+                startAnimationAndMovePlane(msg, false);
                 mThreadClientGame.stopGetData();
                 // TODO: 2017/6/4
                 return;
@@ -260,6 +269,34 @@ public class AtyGameClient extends AppCompatActivity {
             }
         }
     };
+
+
+    public void startAnimationAndMovePlane(Message message, final boolean isMove) {
+        for (int i = 0; i < rollBtns.length; i++) {
+            if (i == message.arg1) {
+                rollBtns[i].startAnimation(mAnimationBtnScale);
+                break;
+            }
+        }
+        mBtnDice.setBackgroundResource(R.drawable.dice_anim);
+        mAnimationDrawable = (AnimationDrawable) mBtnDice.getBackground();
+        mAnimationDrawable.start();
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                mAnimationDrawable.stop();
+                mBtnDice.setBackground(mAnimationDrawable.getFrame(mDice - 1));
+                if (isMove) {
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            movePlane(mIdBtnClicked, mStart, mEnd);
+                        }
+                    }, 2000);
+                }
+            }
+        }, 2000);
+    }
 
     //handler中的飞机移动，只需要知道id和结束的位置就行了----------------------------------------------------------------------------------------------------------------
     private void movePlane(int idBtnClicked, int start, int end) {
@@ -287,15 +324,16 @@ public class AtyGameClient extends AppCompatActivity {
         yellowStars = new ImageView[]{mImageViewYellow1, mImageViewYellow2, mImageViewYellow3, mImageViewYellow4};
         greenStars = new ImageView[]{mImageViewGreen1, mImageViewGreen2, mImageViewGreen3, mImageViewGreen4};
         rollBtns = new Button[]{mButtonRollBlue, mButtonRollRed, mButtonRollYellow, mButtonRollGreen};
+        mAnimationBtnScale = AnimationUtils.loadAnimation(this, R.anim.anim_rollbtn_scale);
+        mBtnDice.setBackgroundResource(R.drawable.dice_anim);
+        initRolesNames();
 
 
         mRoomIp = getIntent().getStringExtra(ROLE_ROOMIP);
         mIndex = Integer.parseInt(getIntent().getStringExtra(ROLE_COLOR));
-
         mRolesColors = getIntent().getStringExtra(ROLE_COLORS);
         mRolesNames = getIntent().getStringExtra(ROLE_NAMES);
 
-        initRolesNames();
 
 
         Log.d(TAG, "进入之后获取的mIndex" + mIndex);
@@ -330,12 +368,8 @@ public class AtyGameClient extends AppCompatActivity {
 
         //比例
         getScale();
-
-
         mBeanCellList = BeanBoard.getAllBeanCell();
         mBeanRoleList = BeanBoard.getRoleList();
-
-
         initRoleAndPlanes();
         toggleHideyBar();
 
@@ -447,7 +481,9 @@ public class AtyGameClient extends AppCompatActivity {
                     String tagFromSever = gameDataFormSever.getTag();
                     Log.d(TAG, "tag:" + tagFromSever);
                     Message message = mHandler.obtainMessage();
+
                     if (roomIpFromSever.startsWith(mRoomIp)) {
+                        mCurrent = gameDataFormSever.getCurrentRole();
                         if (tagFromSever.startsWith(MOVE_PLANE)) {//接收服务器发来的移动飞机的信息，包括设置色子数字和-飞机位置---------------------------------------------------------------------
                             Log.d(TAG, "客户端接受到了消息移动飞机");
 
@@ -467,6 +503,7 @@ public class AtyGameClient extends AppCompatActivity {
                             message.what = WHAT_MOVE_END;
                             mDice = gameDataFormSever.getDice();
                         }
+                        message.arg1 = mCurrent;
                     }
                     mHandler.sendMessage(message);
                 } catch (InterruptedException e) {
@@ -490,6 +527,10 @@ public class AtyGameClient extends AppCompatActivity {
 
     private void findview() {
         mBtnDice = (Button) findViewById(R.id.btn_click);
+        mBtnDice.setBackgroundResource(R.drawable.dice_anim);
+
+        mAnimationDrawable = (AnimationDrawable) mBtnDice.getBackground();
+
         mBtnBlue0 = (Button) findViewById(R.id.btn_blue_0);
         mBtnBlue1 = (Button) findViewById(R.id.btn_blue_1);
         mBtnBlue2 = (Button) findViewById(R.id.btn_blue_2);

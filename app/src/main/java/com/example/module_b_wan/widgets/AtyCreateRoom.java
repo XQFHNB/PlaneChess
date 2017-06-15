@@ -74,8 +74,6 @@ public class AtyCreateRoom extends AtyBase implements IViewWan {
                 break;
             }
         }
-        //先根据名字创建一个client
-//        mIPresenterWan.getClientByName(mRoomName);
 
         ManagerAVImClient.getInstance().open(mRoomName, new AVIMClientCallback() {
             @Override
@@ -97,9 +95,4 @@ public class AtyCreateRoom extends AtyBase implements IViewWan {
     public void getConversation(AVIMConversation conversation) {
         mAVIMConversation = conversation;
     }
-
-//    @Override
-//    public void getClient(AVIMClient client) {
-//        mAVIMClient = client;
-//    }
 }

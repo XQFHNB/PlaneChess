@@ -12,6 +12,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -204,6 +206,7 @@ public class AtyGameSever extends AppCompatActivity {
     private int mStars;
 
     AnimationDrawable mAnimationDrawable;
+    Animation mAnimationBtnScale;
 
 
     //handler主要处理客户端发来消息的内容会引起UI的变化信息-----------------------------------------------------------------------------------------------------------
@@ -213,11 +216,11 @@ public class AtyGameSever extends AppCompatActivity {
             super.handleMessage(msg);
             int what = msg.what;
             if (what == WHAT_MOVE_PLAEN) {//移动不属于本客户端（服务器）的飞机-------------------------------------------------------------------------------------------------
-                movePlane(mIdBtnClicked, mStart, mEnd);
-                mBtnDice.setText(mDice + "");
+                startAnimationAndMovePlane(msg, true);
             } else if (what == WHAT_MOVE_NO) {//客户端发来信息的客户端没有启动，但是还是要设置一下色子数字---------------------------------------------------------------
-                mBtnDice.setText(mDice + "");
+                startAnimationAndMovePlane(msg, false);
             } else if (what == WHAT_MOVE_END) {//接收到客户端的消息，表示客户端已经结束了游戏，所以服务端就不用设置接收线程了---------------------------------------------------------
+                startAnimationAndMovePlane(msg, false);
                 severGame.setStopThread();
             } else if (what == WHAT_ADD_STAR) {
                 int color = Integer.parseInt(mRoomColor);
@@ -232,7 +235,36 @@ public class AtyGameSever extends AppCompatActivity {
                 }
                 mStars++;
             } else if (what == WHAT_DICE_END) {
-                mBtnDice.setBackground(mAnimationDrawable.getFrame(mDice));
+                Random rand = new Random();
+                int dice = rand.nextInt(6) + 1;
+                mDice = dice;
+
+                //色子动画
+                mBtnDice.setBackground(mAnimationDrawable.getFrame(mDice - 1));
+
+                if (currentRole.isAllPlanesInBase()) {
+                    Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机都在基地");
+                    if (mDice == PLANE_TO_START) {
+                        currentRole.movePlaneRoadAndBase();
+                        Log.d(TAG, "当前用户: " + currentRole.getColor() + " 抛出了启动色子，所有的飞机包括在基地的飞机都可以点击");
+                    } else {
+                        Log.d(TAG, "当前用户: " + currentRole.getColor() + " 没有抛出启动色子，并且所有的飞机都在基地，没有办法起飞，直接下一位");
+
+
+                        //向所有的客户端发送消息,消息内容包括行为命令以及下一位用户的index-----------------------------------------------------------------------
+                        int mNextRole = (mCurrent + 1) % 4;
+                        DataBroaCastSerlied gameDataToAllClients = new DataBroaCastSerlied(MOVE_NO, mRoomIp, mDice, 0, 0, 0, mCurrent, mNextRole);
+                        MsgNet msg1 = new MsgNet(gameDataToAllClients.getGameData(), (byte) 0x00);
+                        Log.d(TAG, "服务器点击色子但是没有抛出6直接发出的消息内容：" + msg.toString());
+                        mServerInTele.sendToAll(msg1);
+                        mCurrent = mNextRole;
+                        return;
+                    }
+                } else {
+                    Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机不都在基地,可以点击不是在基地和终点的飞机");
+                    currentRole.movePlaneRoad();
+                }
+
             }
 
 
@@ -243,17 +275,31 @@ public class AtyGameSever extends AppCompatActivity {
         }
     };
 
-
-    //handler中的飞机移动，只需要知道id和结束的位置就行了----------------------------------------------------------------------------------------------------------------
-    private void movePlane(int idBtnClicked, int start, int end) {
-        BeanPlane plane = mIdMap.get(idBtnClicked);
-        Button btn = plane.getBtn();
-        BeanCell cell = mBeanCellList.get(end);
-        int x = 3;
-        float destX = (cell.getX() - x) * mXScale;
-        float destY = (cell.getY() - 2 * x) * mYScale;
-        btn.setX(destX);
-        btn.setY(destY);
+    public void startAnimationAndMovePlane(Message message, final boolean isMove) {
+        for (int i = 0; i < rollBtns.length; i++) {
+            if (i == message.arg1) {
+                rollBtns[i].startAnimation(mAnimationBtnScale);
+                break;
+            }
+        }
+        mBtnDice.setBackgroundResource(R.drawable.dice_anim);
+        mAnimationDrawable = (AnimationDrawable) mBtnDice.getBackground();
+        mAnimationDrawable.start();
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                mAnimationDrawable.stop();
+                mBtnDice.setBackground(mAnimationDrawable.getFrame(mDice - 1));
+                if (isMove) {
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            movePlane(mIdBtnClicked, mStart, mEnd);
+                        }
+                    }, 2000);
+                }
+            }
+        }, 2000);
     }
 
 
@@ -271,6 +317,8 @@ public class AtyGameSever extends AppCompatActivity {
         rollBtns = new Button[]{mButtonRollBlue, mButtonRollRed, mButtonRollYellow, mButtonRollGreen};
         findview();
 
+        mAnimationBtnScale = AnimationUtils.loadAnimation(this, R.anim.anim_rollbtn_scale);
+        mBtnDice.setBackgroundResource(R.drawable.dice_anim);
         try {
             mServerInTele = ServerInTele.newInstance(MAXPLAYER, PORT);
         } catch (IOException e) {
@@ -372,6 +420,116 @@ public class AtyGameSever extends AppCompatActivity {
 
     }
 
+
+    @OnClick(R.id.btn_roll_blue)
+    public void onBtnRollBlueClick() {
+        onRollbtnClick();
+
+    }
+
+    @OnClick(R.id.btn_roll_red)
+    public void onBtnRollRedClick() {
+        onRollbtnClick();
+
+    }
+
+    @OnClick(R.id.btn_roll_yellow)
+    public void onBtnRollYellowClick() {
+        onRollbtnClick();
+
+    }
+
+    @OnClick(R.id.btn_roll_green)
+    public void onBtnRollGreenClick() {
+        onRollbtnClick();
+
+    }
+
+    private void onRollbtnClick() {
+
+
+        mAnimationDrawable.start();
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                mAnimationDrawable.stop();
+                Message message = new Message();
+                message.what = WHAT_DICE_END;
+                mHandler.sendMessage(message);
+            }
+        }, 2000);
+
+    }
+
+    /**
+     * 游戏过程中获取消息的sever-------------------------------------------------------------------------------------------------------
+     */
+
+    class ThreadSeverGame extends Thread {
+        public Object myLock = new Object();
+        private volatile boolean stopThread = false;
+
+        public void setStopThread() {
+            stopThread = true;
+            this.interrupt();
+            mServerInTele.closeAll();
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            try {
+
+                while (!stopThread) {
+                    //收到消息并处理
+                    MsgNet msg = mServerInTele.getData();
+                    Message message = mHandler.obtainMessage();
+                    DataBroaCastSerlied gameDataGetFromClient = UtilDeserializable.getFromNetMsgData(msg.getData());
+                    DataBroaCastSerlied gameDataToAllClients = null;
+                    mDice = gameDataGetFromClient.getDice();
+
+                    String tagFromClient = gameDataGetFromClient.getTag();
+                    if (mRoomIp.equals(gameDataGetFromClient.getRoomIP())) {
+                        if (tagFromClient.equals(MOVE_NO)) { //客户端发来没有投出启动色子的消息
+
+                            Log.d(TAG, "收到 " + mCurrent + " 发来的不动的消息");
+                            int mNextRole = (mCurrent + 1) % 4;
+                            gameDataToAllClients = new DataBroaCastSerlied(MOVE_NO, mRoomIp, mDice, 0, 0, 0, mCurrent, mNextRole);
+                            message.what = WHAT_MOVE_NO;
+                            message.arg1 = mCurrent;
+                            mCurrent = mNextRole;
+                        } else if (tagFromClient.equals(MOVE_PLANE)) {//正常的移动飞机的消息
+                            Log.d(TAG, "收到 " + mCurrent + " 正常移动的消息");
+
+                            int mNextRole = (mCurrent + 1) % 4;
+                            mIdBtnClicked = gameDataGetFromClient.getIdPlane();
+                            mStart = gameDataGetFromClient.getStartIndex();
+                            mEnd = gameDataGetFromClient.getEndIndex();
+
+                            //向所有的客户端广播
+                            gameDataToAllClients = new DataBroaCastSerlied(MOVE_PLANE, mRoomIp, mDice, mIdBtnClicked, mStart, mEnd, mCurrent, mNextRole);
+                            message.what = WHAT_MOVE_PLAEN;
+                            message.arg1 = mCurrent;
+                            mCurrent = mNextRole;
+
+                        } else if (tagFromClient.equals(MOVE_END)) {
+                            gameDataToAllClients = new DataBroaCastSerlied(MOVE_END, mRoomIp, mDice, 0, 0, 0, 0, 0);
+                            message.what = WHAT_MOVE_END;
+                            message.arg1 = mCurrent;
+                        }
+                        mHandler.sendMessage(message);
+                        MsgNet msgToSend = new MsgNet(gameDataToAllClients.getGameData(), (byte) 0x00);
+                        mServerInTele.sendToAll(msgToSend);
+                        Log.d(TAG, "服务器在收到其他玩家发出消息后将消息转发到其他玩家并提醒下一位：" + gameDataToAllClients.toString());
+                    }
+
+                }
+            } catch (InterruptedException e) {
+
+            }
+        }
+
+    }
 
     /**
      * 获取屏幕比例
@@ -520,146 +678,21 @@ public class AtyGameSever extends AppCompatActivity {
     }
 
     public void toast(String str) {
+
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
     }
 
-
-    @OnClick(R.id.btn_roll_blue)
-    public void onBtnRollBlueClick() {
-        onRollbtnClick();
-
+    //handler中的飞机移动，只需要知道id和结束的位置就行了----------------------------------------------------------------------------------------------------------------
+    private void movePlane(int idBtnClicked, int start, int end) {
+        BeanPlane plane = mIdMap.get(idBtnClicked);
+        Button btn = plane.getBtn();
+        BeanCell cell = mBeanCellList.get(end);
+        int x = 3;
+        float destX = (cell.getX() - x) * mXScale;
+        float destY = (cell.getY() - 2 * x) * mYScale;
+        btn.setX(destX);
+        btn.setY(destY);
     }
 
-    @OnClick(R.id.btn_roll_red)
-    public void onBtnRollRedClick() {
-        onRollbtnClick();
 
-    }
-
-    @OnClick(R.id.btn_roll_yellow)
-    public void onBtnRollYellowClick() {
-        onRollbtnClick();
-
-    }
-
-    @OnClick(R.id.btn_roll_green)
-    public void onBtnRollGreenClick() {
-        onRollbtnClick();
-
-    }
-
-    private void onRollbtnClick() {
-
-        Random rand = new Random();
-        int dice = rand.nextInt(6) + 1;
-
-        //色子动画
-        mAnimationDrawable.start();
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                mAnimationDrawable.stop();
-                Message message = new Message();
-                message.what = WHAT_DICE_END;
-                mHandler.sendMessage(message);
-            }
-        }, 1000);
-
-        mDice = dice;
-
-
-        mBtnDice.setBackground(mAnimationDrawable.getFrame(dice));
-
-        if (currentRole.isAllPlanesInBase()) {
-            Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机都在基地");
-            if (mDice == PLANE_TO_START) {
-                currentRole.movePlaneRoadAndBase();
-                Log.d(TAG, "当前用户: " + currentRole.getColor() + " 抛出了启动色子，所有的飞机包括在基地的飞机都可以点击");
-            } else {
-                Log.d(TAG, "当前用户: " + currentRole.getColor() + " 没有抛出启动色子，并且所有的飞机都在基地，没有办法起飞，直接下一位");
-
-
-                //向所有的客户端发送消息,消息内容包括行为命令以及下一位用户的index-----------------------------------------------------------------------
-                int mNextRole = (mCurrent + 1) % 4;
-                DataBroaCastSerlied gameDataToAllClients = new DataBroaCastSerlied(MOVE_NO, mRoomIp, mDice, 0, 0, 0, mCurrent, mNextRole);
-                MsgNet msg = new MsgNet(gameDataToAllClients.getGameData(), (byte) 0x00);
-                Log.d(TAG, "服务器点击色子但是没有抛出6直接发出的消息内容：" + msg.toString());
-                mServerInTele.sendToAll(msg);
-                mCurrent = mNextRole;
-                return;
-            }
-        } else {
-            Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机不都在基地,可以点击不是在基地和终点的飞机");
-            currentRole.movePlaneRoad();
-        }
-
-
-    }
-
-    /**
-     * 游戏过程中获取消息的sever-------------------------------------------------------------------------------------------------------
-     */
-
-    class ThreadSeverGame extends Thread {
-        public Object myLock = new Object();
-        private volatile boolean stopThread = false;
-
-        public void setStopThread() {
-            stopThread = true;
-            this.interrupt();
-            mServerInTele.closeAll();
-        }
-
-        @Override
-        public void run() {
-            super.run();
-            try {
-
-                while (!stopThread) {
-                    //收到消息并处理
-                    MsgNet msg = mServerInTele.getData();
-                    Message message = mHandler.obtainMessage();
-                    DataBroaCastSerlied gameDataGetFromClient = UtilDeserializable.getFromNetMsgData(msg.getData());
-                    DataBroaCastSerlied gameDataToAllClients = null;
-                    mDice = gameDataGetFromClient.getDice();
-
-                    String tagFromClient = gameDataGetFromClient.getTag();
-                    if (mRoomIp.equals(gameDataGetFromClient.getRoomIP())) {
-                        if (tagFromClient.equals(MOVE_NO)) { //客户端发来没有投出启动色子的消息
-
-                            Log.d(TAG, "收到 " + mCurrent + " 发来的不动的消息");
-                            int mNextRole = (mCurrent + 1) % 4;
-                            gameDataToAllClients = new DataBroaCastSerlied(MOVE_NO, mRoomIp, mDice, 0, 0, 0, mCurrent, mNextRole);
-                            mCurrent = mNextRole;
-                            message.what = WHAT_MOVE_NO;
-                        } else if (tagFromClient.equals(MOVE_PLANE)) {//正常的移动飞机的消息
-                            Log.d(TAG, "收到 " + mCurrent + " 正常移动的消息");
-
-                            int mNextRole = (mCurrent + 1) % 4;
-                            mIdBtnClicked = gameDataGetFromClient.getIdPlane();
-                            mStart = gameDataGetFromClient.getStartIndex();
-                            mEnd = gameDataGetFromClient.getEndIndex();
-
-                            //向所有的客户端广播
-                            gameDataToAllClients = new DataBroaCastSerlied(MOVE_PLANE, mRoomIp, mDice, mIdBtnClicked, mStart, mEnd, mCurrent, mNextRole);
-                            message.what = WHAT_MOVE_PLAEN;
-                            mCurrent = mNextRole;
-
-                        } else if (tagFromClient.equals(MOVE_END)) {
-                            gameDataToAllClients = new DataBroaCastSerlied(MOVE_END, mRoomIp, mDice, 0, 0, 0, 0, 0);
-                            message.what = WHAT_MOVE_END;
-                        }
-                        mHandler.sendMessage(message);
-                        MsgNet msgToSend = new MsgNet(gameDataToAllClients.getGameData(), (byte) 0x00);
-                        mServerInTele.sendToAll(msgToSend);
-                        Log.d(TAG, "服务器在收到其他玩家发出消息后将消息转发到其他玩家并提醒下一位：" + gameDataToAllClients.toString());
-                    }
-
-                }
-            } catch (InterruptedException e) {
-
-            }
-        }
-
-    }
 }
