@@ -1,4 +1,4 @@
-package com.example.module_b_lan.game_wifi.client;
+package com.example.module_b_wan.widgets.client;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -18,18 +17,23 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.avos.avoscloud.im.v2.AVIMClient;
+import com.avos.avoscloud.im.v2.AVIMConversation;
+import com.avos.avoscloud.im.v2.AVIMException;
+import com.avos.avoscloud.im.v2.AVIMMessage;
+import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
 import com.example.bean.BeanBoard;
 import com.example.bean.BeanCell;
 import com.example.bean.BeanPlane;
 import com.example.bean.BeanRole;
 import com.example.module_b_lan.network.broadcast.DataBroaCastSerlied;
 import com.example.module_b_lan.network.model.MsgNet;
-import com.example.module_b_lan.network.model.client.Client;
-import com.example.module_b_lan.utils.UtilDeserializable;
+import com.example.module_b_wan.other.event.EventImTypeMessage;
+import com.example.module_b_wan.other.manager.ManagerAVImClient;
+import com.example.module_b_wan.utils.DataText;
+import com.example.module_b_wan.widgets.AtyBase;
 import com.example.yifeihappy.planechess.R;
 
-import java.io.IOException;
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.HashMap;
 import java.util.List;
@@ -39,27 +43,33 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
  * @author XQF
- * @created 2017/6/3
+ * @created 2017/6/15
  */
-public class AtyGameClient extends AppCompatActivity {
+public class AtyGameClient extends AtyBase {
 
-    public static final String ROLE_COLOR = "roleColor";
-    public static final String ROLE_NAMES = "roleNames";
-    public static final String ROLE_COLORS = "roleColors";
-    public static final String ROLE_ROOMIP = "roomip";
+    public static final String TAG_GAME = "game";
+    public static final String TAG_FIRST = "first";
+    public static final String TAG_BEGIN = "begin";
 
 
-    public static void startAtyGameClient(Context context, Class<?> cls, String roleColor, String roomIp, String roleNames, String roleColors) {
+    public static final String KEY_NAMES = "names";
+    public static final String KEY_COLORS = "colors";
+    public static final String KEY_ROLENAME = "rolename";
+    public static final String KEY_ROLECOLOR = "rolecolor";
+    public static final String KEY_CONVERSATIONID = "conversationID";
+
+
+    public static void startAtyGameClient(Context context, Class<?> cls, String conversationId, String names, String colors, String roleName, String roleColor) {
         Intent intent = new Intent(context, cls);
-        intent.putExtra(ROLE_COLOR, roleColor);
-        intent.putExtra(ROLE_ROOMIP, roomIp);
-        intent.putExtra(ROLE_NAMES, roleNames);
-        intent.putExtra(ROLE_COLORS, roleColors);
+        intent.putExtra(KEY_CONVERSATIONID, conversationId);
+        intent.putExtra(KEY_NAMES, names);
+        intent.putExtra(KEY_COLORS, colors);
+        intent.putExtra(KEY_ROLENAME, roleName);
+        intent.putExtra(KEY_ROLECOLOR, roleColor);
         context.startActivity(intent);
     }
 
@@ -209,12 +219,9 @@ public class AtyGameClient extends AppCompatActivity {
     private boolean isFinish = false;
 
 
-    private Client mClient;
-    private String mRoomIp;
     private int mStart;
     private int mEnd;
     private int mIdBtnClicked;
-    private ThreadClientGame mThreadClientGame;
     private int mStars;
 
     private BeanRole currentRole;
@@ -225,6 +232,15 @@ public class AtyGameClient extends AppCompatActivity {
     //房间内所有人员的颜色和名字
     private String mRolesNames;
     private String mRolesColors;
+    private String mRoleColor;
+    private String mRoleName;
+    private String mConversationId;
+
+
+    private AVIMClient mAVIMClient;
+    private AVIMConversation mAVIMConversation;
+
+
     //房间内颜色和名字的映射
     Map<Integer, String> colorAndName = new HashMap<>();
 
@@ -247,7 +263,6 @@ public class AtyGameClient extends AppCompatActivity {
 
             } else if (what == WHAT_MOVE_END) {//服务器发来的游戏结束的消息，收到消息后进行对应调整，停止客户端的接收线程---------------------------------------------------
                 startAnimationAndMovePlane(msg, false);
-                mThreadClientGame.stopGetData();
                 // TODO: 2017/6/4
                 return;
             } else if (what == WHAT_ADD_STAR) {
@@ -270,6 +285,7 @@ public class AtyGameClient extends AppCompatActivity {
                 mBtnDice.setBackground(mAnimationDrawable.getFrame(mDice - 1));
 
                 BeanRole currentRole = mBeanRoleList.get(mIndex);
+
                 if (currentRole.isAllPlanesInBase()) {
                     Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机都在基地");
                     if (mDice == PLANE_TO_START) {
@@ -277,22 +293,16 @@ public class AtyGameClient extends AppCompatActivity {
                         Log.d(TAG, "当前用户: " + currentRole.getColor() + " 抛出了启动色子，所有的飞机包括在基地的飞机都可以点击");
                     } else {
                         Log.d(TAG, "当前用户: " + currentRole.getColor() + " 没有抛出启动色子，并且所有的飞机都在基地，没有办法起飞，直接下一位");
-
-
-                        //向服务器发送不动的消息------------------------------------------------------------------------------------------------------
-                        DataBroaCastSerlied dataToSever = new DataBroaCastSerlied(MOVE_NO, mRoomIp, mDice, 0, 0, 0, 0, 0);
-                        MsgNet msg1 = new MsgNet(dataToSever.toString(), (byte) 0x00);
-                        try {
-                            mClient.sendToServer(msg1);
-                        } catch (SocketException e) {
-                            e.printStackTrace();
-                        }
+                        //发送不动的消息------------------------------------------------------------------------------------------------------
+                        int next = (mIndex + 1) % 4;
+                        sendGameMessage(MOVE_NO, mDice, 0, 0, 0, mIndex, next);
                         return;
                     }
                 } else {
                     Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机不都在基地,可以点击不是在基地和终点的飞机");
                     currentRole.movePlaneRoad();
                 }
+//
             }
 
             //若服务器附带的消息表明本客户端就是接下来应该表演的客户端，于是提示用户，并进行相应设置，比如设置色子可点击--------------------------------------------------------
@@ -304,53 +314,12 @@ public class AtyGameClient extends AppCompatActivity {
     };
 
 
-    public void startAnimationAndMovePlane(Message message, final boolean isMove) {
-        for (int i = 0; i < rollBtns.length; i++) {
-            if (i == message.arg1) {
-                rollBtns[i].startAnimation(mAnimationBtnScale);
-                break;
-            }
-        }
-        mBtnDice.setBackgroundResource(R.drawable.dice_anim);
-        mAnimationDrawable = (AnimationDrawable) mBtnDice.getBackground();
-        mAnimationDrawable.start();
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                mAnimationDrawable.stop();
-                mBtnDice.setBackground(mAnimationDrawable.getFrame(mDice - 1));
-                if (isMove) {
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            movePlane(mIdBtnClicked, mStart, mEnd);
-                        }
-                    }, 2000);
-                }
-            }
-        }, 2000);
-    }
-
-    //handler中的飞机移动，只需要知道id和结束的位置就行了----------------------------------------------------------------------------------------------------------------
-    private void movePlane(int idBtnClicked, int start, int end) {
-        BeanPlane plane = mIdMap.get(idBtnClicked);
-        Button btn = plane.getBtn();
-        BeanCell cell = mBeanCellList.get(end);
-        int x = 3;
-        float destX = (cell.getX() - x) * mXScale;
-        float destY = (cell.getY() - 2 * x) * mYScale;
-        btn.setX(destX);
-        btn.setY(destY);
-    }
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.aty_game_sever);
-        ButterKnife.bind(this);
+        //----------------------------------------------------------------------------------------------UI初始化部分
         findview();
-
-
         avatarBtns = new Button[]{mBtnAvatarBlue, mBtnAvatarRed, mBtnAvatarYellow, mBtnAvatarGreen};
         blueStars = new ImageView[]{mImageViewBlue1, mImageViewBlue2, mImageViewBlue3, mImageViewBlue4};
         redStars = new ImageView[]{mImageViewRed1, mImageViewRed2, mImageViewRed3, mImageViewRed4};
@@ -359,13 +328,20 @@ public class AtyGameClient extends AppCompatActivity {
         rollBtns = new Button[]{mButtonRollBlue, mButtonRollRed, mButtonRollYellow, mButtonRollGreen};
         mAnimationBtnScale = AnimationUtils.loadAnimation(this, R.anim.anim_rollbtn_scale);
         mBtnDice.setBackgroundResource(R.drawable.dice_anim);
+
+        //------------------------------------------------------------------------------------------=获取Intenet数据部分
+        mRoleColor = getIntent().getStringExtra(KEY_ROLECOLOR);
+        mIndex = Integer.parseInt(mRoleColor);
+        mConversationId = getIntent().getStringExtra(KEY_CONVERSATIONID);
+        mRoleName = getIntent().getStringExtra(KEY_ROLENAME);
+        mRolesColors = getIntent().getStringExtra(KEY_COLORS);
+        mRolesNames = getIntent().getStringExtra(KEY_NAMES);
+
         initRolesNames();
 
 
-        mRoomIp = getIntent().getStringExtra(ROLE_ROOMIP);
-        mIndex = Integer.parseInt(getIntent().getStringExtra(ROLE_COLOR));
-        mRolesColors = getIntent().getStringExtra(ROLE_COLORS);
-        mRolesNames = getIntent().getStringExtra(ROLE_NAMES);
+        mAVIMClient = ManagerAVImClient.getInstance().getClient();
+        mAVIMConversation = mAVIMClient.getConversation(mConversationId);
 
 
         Log.d(TAG, "进入之后获取的mIndex" + mIndex);
@@ -394,9 +370,6 @@ public class AtyGameClient extends AppCompatActivity {
         }
         Log.d(TAG, "我就是一条狗");
 
-
-        mThreadClientGame = new ThreadClientGame();
-        mThreadClientGame.start();
 
         //比例
         getScale();
@@ -450,35 +423,50 @@ public class AtyGameClient extends AppCompatActivity {
         indexPlaneEnd = plane.getAfterMoveIndexFinal();
         if (currentRole.isAllPlanesInEnd()) {
             toast("游戏结束！");
-
-
-            //向服务器发送游戏结束的消息---------------------------------------------------------------------------------------------------------
-            DataBroaCastSerlied dataToSever = new DataBroaCastSerlied(MOVE_END, mRoomIp, mDice, 0, 0, 0, 0, 0);
-            MsgNet msg = new MsgNet(dataToSever.toString(), (byte) 0x00);
-            try {
-                mClient.sendToServer(msg);
-            } catch (SocketException e) {
-                e.printStackTrace();
-            }
+            //发送游戏结束的消息---------------------------------------------------------------------------------------------------------
+            sendGameMessage(MOVE_END, mDice, 0, 0, 0, mIndex, 0);
             isFinish = true;
 
-
         } else {
-
-            //向服务器发送本client移动飞机的位置信息--------------------------------------------------------------------------------------------
-            DataBroaCastSerlied dataToSever = new DataBroaCastSerlied(MOVE_PLANE, mRoomIp, mDice, mIdBtnClicked, 0, indexPlaneEnd, 0, 0);
-
-            Log.d(TAG, "玩家正常移动飞机向服务器发送消息内容：" + dataToSever.getGameData());
-            MsgNet msg = new MsgNet(dataToSever.getGameData(), (byte) 0x00);
-            try {
-                mClient.sendToServer(msg);
-            } catch (SocketException e) {
-                e.printStackTrace();
-            }
+            //发送本client移动飞机的位置信息--------------------------------------------------------------------------------------------
+            int next = (mIndex + 1) % 4;
+            sendGameMessage(MOVE_PLANE, mDice, mIdBtnClicked, 0, indexPlaneEnd, mIndex, next);
         }
         toast("下一位用户");
 
     }
+
+    public void onEvent(EventImTypeMessage eventImTypeMessage) {
+
+        AVIMMessage message1 = eventImTypeMessage.message;
+        DataText text = DataText.getDataTextFromString(message1.getContent());
+        Message message = new Message();
+        if (text.getTag().equals(TAG_GAME)) {
+            if (text.getGameTag().equals(MOVE_NO)) {
+                message.what = WHAT_MOVE_NO;
+                mDice = text.getGameDice();
+                mCurrent = text.getGameCurrent();
+                mNextRole = text.getGameNextRole();
+            } else if (text.getGameTag().equals(MOVE_END)) {
+                message.what = WHAT_MOVE_END;
+                mDice = text.getGameDice();
+                mCurrent = text.getGameCurrent();
+
+            } else if (text.getGameTag().equals(MOVE_PLANE)) {
+                message.what = WHAT_MOVE_PLAEN;
+                mDice = text.getGameDice();
+                mCurrent = text.getGameCurrent();
+                mNextRole = text.getGameNextRole();
+                mIdBtnClicked = text.getGameBtnClickId();
+                mStart = text.getGameStart();
+                mEnd = text.getGameEnd();
+            }
+            message.arg1 = mCurrent;
+            mHandler.sendMessage(message);
+        }
+
+    }
+
 
     @OnClick(R.id.btn_roll_blue)
     public void onBtnRollBlueClick() {
@@ -505,84 +493,20 @@ public class AtyGameClient extends AppCompatActivity {
     }
 
     private void onRollbtnClick() {
+
+        mAnimationDrawable = (AnimationDrawable) mBtnDice.getBackground();
         mAnimationDrawable.start();
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                mAnimationDrawable.stop();
-                Message message = new Message();
-                message.what = WHAT_DICE_END;
-                mHandler.sendMessage(message);
+                mAnimationDrawable.start();
+                mHandler.sendEmptyMessage(WHAT_DICE_END);
             }
         }, 2000);
 
 
     }
 
-    class ThreadClientGame extends Thread {
-        public Object myLock = new Object();
-        private volatile boolean stopThread = false;
-
-        public void stopGetData() {
-            stopThread = true;
-            mClient.close();
-            this.interrupt();
-
-        }
-
-        @Override
-        public void run() {
-            super.run();
-            try {
-                mClient = Client.newInstance(InetAddress.getByName(mRoomIp), SOCKET_PORT);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            while (!stopThread) {
-                try {
-
-
-                    MsgNet msg = mClient.getData();
-                    Log.d(TAG, "客户端接受到了消息--------------------------" + msg.toString());
-                    Log.d(TAG, "再次确认客户端接受到了消息" + msg.toString());
-                    DataBroaCastSerlied gameDataFormSever = UtilDeserializable.getFromNetMsgData(msg.getData());
-                    Log.d(TAG, "gamedataFromSever:" + gameDataFormSever.getGameData());
-                    String roomIpFromSever = gameDataFormSever.getRoomIP();
-                    Log.d(TAG, "roomIp:" + roomIpFromSever);
-                    String tagFromSever = gameDataFormSever.getTag();
-                    Log.d(TAG, "tag:" + tagFromSever);
-                    Message message = mHandler.obtainMessage();
-
-                    if (roomIpFromSever.startsWith(mRoomIp)) {
-                        mCurrent = gameDataFormSever.getCurrentRole();
-                        if (tagFromSever.startsWith(MOVE_PLANE)) {//接收服务器发来的移动飞机的信息，包括设置色子数字和-飞机位置---------------------------------------------------------------------
-                            Log.d(TAG, "客户端接受到了消息移动飞机");
-
-                            message.what = WHAT_MOVE_PLAEN;
-                            mDice = gameDataFormSever.getDice();
-                            mIdBtnClicked = gameDataFormSever.getIdPlane();
-                            mStart = gameDataFormSever.getStartIndex();
-                            mEnd = gameDataFormSever.getEndIndex();
-                            mNextRole = gameDataFormSever.getNextRole();
-                        } else if (tagFromSever.startsWith(MOVE_NO)) {//接收服务器发来的不移动飞机的信息，但是要设置色子的数字---------------------------------------------------------
-                            Log.d(TAG, "客户端接受到了消息不移动飞机");
-
-                            message.what = WHAT_MOVE_NO;
-                            mDice = gameDataFormSever.getDice();
-                            mNextRole = gameDataFormSever.getNextRole();
-                        } else if (tagFromSever.startsWith(MOVE_END)) {//接收服务器发来的游戏结束的消息，设置一下色子数---------------------------------------------------------------------
-                            message.what = WHAT_MOVE_END;
-                            mDice = gameDataFormSever.getDice();
-                        }
-                        message.arg1 = mCurrent;
-                    }
-                    mHandler.sendMessage(message);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
 
     /**
      * 获取屏幕比例
@@ -736,4 +660,65 @@ public class AtyGameClient extends AppCompatActivity {
     }
 
 
+    public void startAnimationAndMovePlane(Message message, final boolean isMove) {
+        for (int i = 0; i < rollBtns.length; i++) {
+            if (i == message.arg1) {
+                rollBtns[i].startAnimation(mAnimationBtnScale);
+                break;
+            }
+        }
+        mBtnDice.setBackgroundResource(R.drawable.dice_anim);
+        mAnimationDrawable = (AnimationDrawable) mBtnDice.getBackground();
+        mAnimationDrawable.start();
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                mAnimationDrawable.stop();
+                mBtnDice.setBackground(mAnimationDrawable.getFrame(mDice - 1));
+                if (isMove) {
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            movePlane(mIdBtnClicked, mStart, mEnd);
+                        }
+                    }, 2000);
+                }
+            }
+        }, 2000);
+    }
+
+    //handler中的飞机移动，只需要知道id和结束的位置就行了----------------------------------------------------------------------------------------------------------------
+    private void movePlane(int idBtnClicked, int start, int end) {
+        BeanPlane plane = mIdMap.get(idBtnClicked);
+        Button btn = plane.getBtn();
+        BeanCell cell = mBeanCellList.get(end);
+        int x = 3;
+        float destX = (cell.getX() - x) * mXScale;
+        float destY = (cell.getY() - 2 * x) * mYScale;
+        btn.setX(destX);
+        btn.setY(destY);
+    }
+
+    private void sendGameMessage(String tag, int dice, int idBtnClicked, int start, int end, int current, int nextRole) {
+        AVIMMessage message = new AVIMMessage();
+        DataText text = new DataText();
+        text.setTag(TAG_GAME);
+        text.setGameTag(tag);
+        text.setGameDice(dice);
+        text.setGameBtnClickId(idBtnClicked);
+        text.setGameStart(start);
+        text.setGameEnd(end);
+        text.setGameCurrent(current);
+        text.setGameNextRole(nextRole);
+        message.setContent(DataText.getDataTextContentString(text));
+        mAVIMConversation.sendMessage(message, new AVIMConversationCallback() {
+            @Override
+            public void done(AVIMException e) {
+                if (null == e) {
+                    toast("发送游戏数据成功");
+                }
+            }
+        });
+
+    }
 }

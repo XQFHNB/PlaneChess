@@ -15,11 +15,11 @@ import de.greenrobot.event.EventBus;
  * @author XQF
  * @created 2017/6/12
  */
-public class HandlerMessage extends AVIMTypedMessageHandler<AVIMTypedMessage> {
+public class HandlerReceiveMessageInConversationEvent extends AVIMTypedMessageHandler<AVIMTypedMessage> {
 
     private Context context;
 
-    public HandlerMessage(Context context) {
+    public HandlerReceiveMessageInConversationEvent(Context context) {
         this.context = context;
     }
 
@@ -59,14 +59,4 @@ public class HandlerMessage extends AVIMTypedMessageHandler<AVIMTypedMessage> {
         EventBus.getDefault().post(event);
     }
 
-//    private void sendNotification(AVIMTypedMessage message, AVIMConversation conversation) {
-//        String notificationContent = message instanceof AVIMTextMessage ?
-//                ((AVIMTextMessage) message).getText() : context.getString(R.string.unspport_message_type);
-//
-//        //包装一个notification用的intent,这个intent就是发送一个广播
-//        Intent intent = new Intent(context, NotificationBroadcastReceiver.class);
-//        intent.putExtra(Constants.CONVERSATION_ID, conversation.getConversationId());
-//        intent.putExtra(Constants.MEMBER_ID, message.getFrom());
-//        NotificationUtils.showNotification(context, "", notificationContent, null, intent);
-//    }
 }

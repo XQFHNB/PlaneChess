@@ -1,14 +1,12 @@
-package com.example.module_b_wan.widgets;
+package com.example.module_b_wan.widgets.creator;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMConversation;
@@ -18,10 +16,10 @@ import com.example.module_b_wan.other.manager.ManagerAVImClient;
 import com.example.module_b_wan.presenter.IPresenterWan;
 import com.example.module_b_wan.presenter.PresenterWanImpl;
 import com.example.module_b_wan.view.IViewWan;
+import com.example.module_b_wan.widgets.AtyBase;
 import com.example.yifeihappy.planechess.R;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**

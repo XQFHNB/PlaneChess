@@ -16,7 +16,7 @@ import de.greenrobot.event.EventBus;
  * @author XQF
  * @created 2017/6/13
  */
-public class HandlerCustomConversationEvent extends AVIMConversationEventHandler {
+public class HandlerEnterConversationEvent extends AVIMConversationEventHandler {
 
     @Override
     public void onMemberLeft(AVIMClient client, AVIMConversation conversation, List<String> members,

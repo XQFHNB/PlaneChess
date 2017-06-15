@@ -319,6 +319,7 @@ public class AtyGameSever extends AppCompatActivity {
 
         mAnimationBtnScale = AnimationUtils.loadAnimation(this, R.anim.anim_rollbtn_scale);
         mBtnDice.setBackgroundResource(R.drawable.dice_anim);
+
         try {
             mServerInTele = ServerInTele.newInstance(MAXPLAYER, PORT);
         } catch (IOException e) {
@@ -447,7 +448,7 @@ public class AtyGameSever extends AppCompatActivity {
 
     private void onRollbtnClick() {
 
-
+        mAnimationDrawable = (AnimationDrawable) mBtnDice.getBackground();
         mAnimationDrawable.start();
         new Timer().schedule(new TimerTask() {
             @Override

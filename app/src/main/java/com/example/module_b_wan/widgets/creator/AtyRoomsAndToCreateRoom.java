@@ -1,4 +1,4 @@
-package com.example.module_b_wan.widgets;
+package com.example.module_b_wan.widgets.creator;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -22,6 +22,8 @@ import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
 import com.example.bean.BeanRoomInfo;
 import com.example.module_b_lan.network.broadcast.DataBroaCastSerlied;
+import com.example.module_b_wan.widgets.AtyBase;
+import com.example.module_b_wan.widgets.client.AtyClientSetting;
 import com.example.yifeihappy.planechess.R;
 
 import java.util.ArrayList;
@@ -114,6 +116,9 @@ public class AtyRoomsAndToCreateRoom extends AtyBase {
         @OnClick(R.id.btn_join_room)
         public void onBtnJoinClick() {
 
+
+            AtyClientSetting.startAtyClientSetting(AtyRoomsAndToCreateRoom.this, AtyClientSetting.class, conversationId);
+            finish();
         }
     }
 
