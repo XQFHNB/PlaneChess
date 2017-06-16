@@ -35,13 +35,4 @@ public class PresenterWanImpl implements IPresenterWan {
         });
     }
 
-//    @Override
-//    public void getClientByName(String name) {
-//        mIModelWan.getClient(name, new OnLoadClientListener() {
-//            @Override
-//            public void onSucess(AVIMClient client) {
-//                mIViewWan.getClient(client);
-//            }
-//        });
-//    }
 }

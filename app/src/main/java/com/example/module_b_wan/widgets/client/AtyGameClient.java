@@ -508,6 +508,9 @@ public class AtyGameClient extends AtyBase {
     }
 
 
+
+
+
     /**
      * 获取屏幕比例
      */

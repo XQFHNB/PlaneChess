@@ -85,7 +85,7 @@ public class AtyCreateRoom extends AtyBase implements IViewWan {
             mIPresenterWan.createConversationByNameAndType(mAVIMClient, mRoomName);
         }
         String conversationId = mAVIMConversation.getConversationId();
-        AtyWaitClients.startAtyWaitClients(this, AtyWaitClients.class, conversationId,mRoomName);
+        AtyWaitClients.startAtyWaitClients(this, AtyWaitClients.class, conversationId, mRoomName, mRoleColor);
     }
 
 
