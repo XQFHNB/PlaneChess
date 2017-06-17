@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
@@ -26,11 +25,14 @@ import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
 import com.example.bean.BeanBoard;
 import com.example.bean.BeanCell;
 import com.example.bean.BeanPlane;
+import com.example.bean.BeanRobot;
 import com.example.bean.BeanRole;
 import com.example.module_b_wan.other.event.EventImTypeMessage;
 import com.example.module_b_wan.other.manager.ManagerAVImClient;
 import com.example.module_b_wan.utils.DataText;
 import com.example.module_b_wan.widgets.AtyBase;
+import com.example.module_b_wan.widgets.replay.DBHelper;
+import com.example.module_b_wan.widgets.replay.table.RoleInfo;
 import com.example.yifeihappy.planechess.R;
 
 import java.util.HashMap;
@@ -142,6 +144,17 @@ public class AtyGameCreator extends AtyBase {
     Button mButtonRollGreen;
     Button[] rollBtns = null;
 
+    @BindView(R.id.btn_stop_blue)
+    protected Button mButtonStopBule;
+    @BindView(R.id.btn_stop_red)
+    protected Button mButtonStopRed;
+    @BindView(R.id.btn_stop_yellow)
+    protected Button mButtonStopYellow;
+    @BindView(R.id.btn_stop_green)
+    protected Button mButtonStopGreen;
+
+    Button[] stopBtns = null;
+
     @BindView(R.id.image_star_red_1)
     ImageView mImageViewRed1;
     @BindView(R.id.image_star_red_2)
@@ -225,6 +238,7 @@ public class AtyGameCreator extends AtyBase {
     private BeanRole currentRole;
     AnimationDrawable mAnimationDrawable;
     Animation mAnimationBtnScale;
+    BeanRobot mRobot = new BeanRobot();
 
 
     //房间内所有人员的颜色和名字
@@ -237,6 +251,7 @@ public class AtyGameCreator extends AtyBase {
 
     private AVIMClient mAVIMClient;
     private AVIMConversation mAVIMConversation;
+    int counter = 0;
 
 
     //房间内颜色和名字的映射
@@ -281,9 +296,7 @@ public class AtyGameCreator extends AtyBase {
                 int dice = rand.nextInt(6) + 1;
                 mDice = dice;
                 mBtnDice.setBackground(mAnimationDrawable.getFrame(mDice - 1));
-
-                BeanRole currentRole = mBeanRoleList.get(mIndex);
-
+                currentRole = mBeanRoleList.get(mIndex);
                 if (currentRole.isAllPlanesInBase()) {
                     Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机都在基地");
                     if (mDice == PLANE_TO_START) {
@@ -299,6 +312,13 @@ public class AtyGameCreator extends AtyBase {
                 } else {
                     Log.d(TAG, "当前用户: " + currentRole.getColor() + " 所有的飞机不都在基地,可以点击不是在基地和终点的飞机");
                     currentRole.movePlaneRoad();
+                }
+                if (currentRole.isMandatory()) {
+                    mRobot.robotClickPlane(currentRole);
+                }
+                if (currentRole.isAllPlanesInEnd()) {
+                    toast("游戏结束！");
+                    isFinish = true;
                 }
 //
             }
@@ -324,6 +344,7 @@ public class AtyGameCreator extends AtyBase {
         yellowStars = new ImageView[]{mImageViewYellow1, mImageViewYellow2, mImageViewYellow3, mImageViewYellow4};
         greenStars = new ImageView[]{mImageViewGreen1, mImageViewGreen2, mImageViewGreen3, mImageViewGreen4};
         rollBtns = new Button[]{mButtonRollBlue, mButtonRollRed, mButtonRollYellow, mButtonRollGreen};
+        stopBtns = new Button[]{mButtonStopBule, mButtonStopRed, mButtonStopYellow, mButtonStopGreen};
         mAnimationBtnScale = AnimationUtils.loadAnimation(this, R.anim.anim_rollbtn_scale);
         mBtnDice.setBackgroundResource(R.drawable.dice_anim);
 
@@ -334,6 +355,9 @@ public class AtyGameCreator extends AtyBase {
         mRoleName = getIntent().getStringExtra(KEY_ROLENAME);
         mRolesColors = getIntent().getStringExtra(KEY_COLORS);
         mRolesNames = getIntent().getStringExtra(KEY_NAMES);
+
+        DBHelper.saveDataRoleInfos(mRolesNames, mRolesColors);
+
 
         initRolesNames();
 
@@ -361,13 +385,15 @@ public class AtyGameCreator extends AtyBase {
         for (int i = 0; i < rollBtns.length; i++) {
             if (i == mIndex) {
                 rollBtns[i].setClickable(true);
+                stopBtns[i].setClickable(true);
             } else {
                 rollBtns[i].setClickable(false);
                 rollBtns[i].setBackground(null);
+                stopBtns[i].setClickable(false);
+                stopBtns[i].setBackground(null);
             }
         }
         Log.d(TAG, "我就是一条狗");
-
 
         //比例
         getScale();
@@ -442,6 +468,9 @@ public class AtyGameCreator extends AtyBase {
         DataText text = DataText.getDataTextFromString(message1.getContent());
         Message message = new Message();
         if (text.getTag().equals(TAG_GAME)) {
+            //放进数据库
+            DBHelper.saveDataGameRecords(message1);
+
             if (text.getGameTag().equals(MOVE_NO)) {
                 message.what = WHAT_MOVE_NO;
                 mDice = text.getGameDice();
@@ -471,24 +500,27 @@ public class AtyGameCreator extends AtyBase {
     @OnClick(R.id.btn_roll_blue)
     public void onBtnRollBlueClick() {
         onRollbtnClick();
-
+        mButtonRollBlue.startAnimation(mAnimationBtnScale);
     }
 
     @OnClick(R.id.btn_roll_red)
     public void onBtnRollRedClick() {
         onRollbtnClick();
+        mButtonRollRed.startAnimation(mAnimationBtnScale);
 
     }
 
     @OnClick(R.id.btn_roll_yellow)
     public void onBtnRollYellowClick() {
         onRollbtnClick();
+        mButtonRollYellow.startAnimation(mAnimationBtnScale);
 
     }
 
     @OnClick(R.id.btn_roll_green)
     public void onBtnRollGreenClick() {
         onRollbtnClick();
+        mButtonRollGreen.startAnimation(mAnimationBtnScale);
 
     }
 
@@ -499,12 +531,49 @@ public class AtyGameCreator extends AtyBase {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                mAnimationDrawable.start();
+                mAnimationDrawable.stop();
                 mHandler.sendEmptyMessage(WHAT_DICE_END);
             }
         }, 2000);
 
 
+    }
+
+    @OnClick(R.id.btn_stop_blue)
+    public void onBtnStopBlueClick() {
+        onBtnStopClick();
+        mButtonStopBule.startAnimation(mAnimationBtnScale);
+    }
+
+
+    @OnClick(R.id.btn_stop_red)
+    public void onBtnStopRedClick() {
+        onBtnStopClick();
+        mButtonStopRed.startAnimation(mAnimationBtnScale);
+    }
+
+    @OnClick(R.id.btn_stop_yellow)
+    public void onBtnStopYellowClick() {
+        onBtnStopClick();
+        mButtonStopYellow.startAnimation(mAnimationBtnScale);
+
+    }
+
+    @OnClick(R.id.btn_stop_green)
+    public void onBtnStopGreenClick() {
+        onBtnStopClick();
+        mButtonStopGreen.startAnimation(mAnimationBtnScale);
+    }
+
+    private void onBtnStopClick() {
+        if (counter % 2 == 0) {
+            toast("你将进入托管模式");
+            currentRole.setMandatory(true);
+        } else {
+            toast("离开托管模式");
+            currentRole.setMandatory(false);
+        }
+        counter++;
     }
 
 

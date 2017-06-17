@@ -10,6 +10,7 @@ public class DataText {
     public static final String TAG_FIRST = "first";
     public static final String TAG_BEGIN = "begin";
 
+
     private String mTag;
     private String mName;
     private String mColor;
